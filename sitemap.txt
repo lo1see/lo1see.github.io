@@ -2,6 +2,5 @@ http://yoursite.com/link/index.html
 http://yoursite.com/categories/index.html
 http://yoursite.com/tags/index.html
 http://yoursite.com/2023/03/18/test/
-http://yoursite.com/2023/03/18/MyLoader/
 http://yoursite.com/2023/03/17/hello-world/
 http://yoursite.com/
