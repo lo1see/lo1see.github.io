@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>PELoader | Now My Blog</title><meta name="author" content="Yourname,yourname@yourmail.com"><meta name="copyright" content="Yourname"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="PELoaderPELoader？首先要清楚PELoader是干什么的。 PELoader就相当于一个PE文件加载器，通过运行PELoader可以打开一个PE程序，该PE程序并不是系统为你打开的。运行起来的效果一般和双击是一样的。个人认为也是可以通过PEloader修改文件在内存中的数据的。 通过写PEloader可以让我们更清楚的了解PE文件的结构，以及运行原理，这对于理解计算机底层是十分有帮助">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PELoader">
+<meta property="og:url" content="http://yoursite.com/2023/03/18/MyLoader/index.html">
+<meta property="og:site_name" content="Now My Blog">
+<meta property="og:description" content="PELoaderPELoader？首先要清楚PELoader是干什么的。 PELoader就相当于一个PE文件加载器，通过运行PELoader可以打开一个PE程序，该PE程序并不是系统为你打开的。运行起来的效果一般和双击是一样的。个人认为也是可以通过PEloader修改文件在内存中的数据的。 通过写PEloader可以让我们更清楚的了解PE文件的结构，以及运行原理，这对于理解计算机底层是十分有帮助">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-03-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-17T16:00:00.000Z">
+<meta property="article:author" content="Yourname">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://yoursite.com/2023/03/18/MyLoader/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'PELoader',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-3-18 0:00:00'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Now My Blog" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 目录</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url('https://s1.ax1x.com/2023/03/18/ppJS6L6.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Now My Blog"><img class="site-icon" src="https://s1.ax1x.com/2023/03/14/ppl4Y0U.png"/><span class="site-name">Now My Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 目录</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">PELoader</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-03-17T16:00:00.000Z" title="发表于 2023-3-18 0:00:00">2023-3-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-03-17T16:00:00.000Z" title="更新于 2023-3-18 0:00:00">2023-3-18</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="PELoader"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="PELoader"><a href="#PELoader" class="headerlink" title="PELoader"></a>PELoader</h1><h2 id="PELoader？"><a href="#PELoader？" class="headerlink" title="PELoader？"></a>PELoader？</h2><p>首先要清楚PELoader是干什么的。</p>
+<p>PELoader就相当于一个PE文件加载器，通过运行PELoader可以打开一个PE程序，该PE程序并不是系统为你打开的。运行起来的效果一般和双击是一样的。个人认为也是可以通过PEloader修改文件在内存中的数据的。</p>
+<p>通过写PEloader可以让我们更清楚的了解PE文件的结构，以及运行原理，这对于理解计算机底层是十分有帮助的。</p>
+<h2 id="IDE选择"><a href="#IDE选择" class="headerlink" title="IDE选择"></a>IDE选择</h2><p>推荐使用Visual Studio</p>
+<p>师傅在辅导我写PEloader时，指导我使用了Visual Studio 2022。VS的调试功能十分强大，可以在逐步调试时查看内存，将C代码反汇编等等。在代码不能顺利运行时可以更好的进行调试。</p>
+<p>VS的安全检查比较严格，自己的代码运行时需要关闭安全检查。还有完成后要注意自己要运行的程序是32位还是64位的程序，以及VS本身是x86运行还是x64运行。</p>
+<h2 id="main-函数"><a href="#main-函数" class="headerlink" title="main()函数"></a>main()函数</h2><p>因为代码量不小，所以我选择了分为main函数和头文件，再调用头文件中的函数。</p>
+<p>在main函数中</p>
+<h3 id="1-文件路径"><a href="#1-文件路径" class="headerlink" title="1.文件路径"></a>1.文件路径</h3><p>我们需要获得文件的地址，也就是文件路径字符串。</p>
+<h3 id="2-寻找文件"><a href="#2-寻找文件" class="headerlink" title="2.寻找文件"></a>2.寻找文件</h3><p>根据文件路径，通过<code>fopen()</code>函数找到文件，并给予权限。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if ((fp = fopen(file, &quot;rb&quot;)) == NULL)</span><br><span class="line">&#123;</span><br><span class="line">	printf(&quot;Open file fail&quot;);</span><br><span class="line">	exit(1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-分配”磁盘”"><a href="#3-分配”磁盘”" class="headerlink" title="3.分配”磁盘”"></a>3.分配”磁盘”</h3><p>计算出文件大小，并分配出一块等大小的内存区域(我声明为<code>pBuf</code>)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fseek(fp, 0, SEEK_END);</span><br><span class="line">last = ftell(fp);</span><br><span class="line">fsize = last;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-复制"><a href="#4-复制" class="headerlink" title="4.复制"></a>4.复制</h3><p>将文件的二进制信息全部复制到这块内存区域中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fseek(fp, 0, SEEK_SET);</span><br><span class="line">pBuf = (PBYTE)malloc(fsize);</span><br><span class="line">fread(pBuf, fsize, 1, fp);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Check一下PE"><a href="#Check一下PE" class="headerlink" title="Check一下PE"></a>Check一下PE</h2><p>在将文件读入<code>malloc()</code>给予的内存空间中后，我们拥有了对文件进行操作的权限。在此我将<code>pBuf</code>视为在磁盘中，稍后再将“磁盘”中的文件信息传入内存。</p>
+<p>对<code>pBuf</code>进行一个检查，check以下该文件是不是PE文件，若不是，则退出程序。</p>
+<p>判断PE文件方法即为判断DOS头中的<code>e_magic</code>和NT头中的<code>Signature</code>签名。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (pDOSheader-&gt;e_magic == IMAGE_DOS_SIGNATURE) &#123;</span><br><span class="line">	if (pNTheader-&gt;Signature == IMAGE_NT_SIGNATURE) &#123;</span><br><span class="line">		return true;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="LoadPE"><a href="#LoadPE" class="headerlink" title="LoadPE"></a>LoadPE</h2><p>这里开始进行最主要的加载过程</p>
+<h3 id="1-定位"><a href="#1-定位" class="headerlink" title="1.定位"></a>1.定位</h3><p>利用传入的参数<code>pBuf</code>，得到DOS头，NT头，节区头并赋值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PIMAGE_DOS_HEADER pDOSheader = (PIMAGE_DOS_HEADER)pBuf;//赋值DOS头</span><br><span class="line"></span><br><span class="line">PIMAGE_NT_HEADERS32 pNTheader = (PIMAGE_NT_HEADERS32)(pBuf + pDOSheader-&gt;e_lfanew);//赋值NT头</span><br><span class="line"></span><br><span class="line">PIMAGE_SECTION_HEADER pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)(pNTheader)+ 0x18 + (pNTheader-&gt;FileHeader.SizeOfOptionalHeader));//赋值节区头</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-分配”内存”"><a href="#2-分配”内存”" class="headerlink" title="2.分配”内存”"></a>2.分配”内存”</h3><p>通过<code>VirtualAlloc()</code>函数分配出一片和PE文件同样大的内存区域~，这个大小在可选头的<code>SizeOfImage</code>有保存。我们将这片区域<code>pAlloc</code>视为“内存”中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PBYTE pAlloc = (PBYTE)VirtualAlloc(NULL, pNTheader-&gt;OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);</span><br></pre></td></tr></table></figure>
+
+<p>然后对这片区域利用<code>memset()</code>进行初始化。之后就可将在“磁盘”中的<code>pBuf</code>的文件头加载到“内存”区域的pAlloc。<code>pAlloc</code>的地址就是程序运行时的加载地址。</p>
+<h3 id="3-加载节区"><a href="#3-加载节区" class="headerlink" title="3.加载节区"></a>3.加载节区</h3><p>通过一二步之后，准备工作就完成了。接下来要开始循环加载节区信息。</p>
+<p>通过学习PE文件的知识，我们知道了磁盘文件或内存的节区大小必定为<code>FileAlignment</code>或<code>SectionAlignment</code>值的整数倍，若不为整数倍，计算机会自动补00对齐。</p>
+<p>通过010 editor观察文件易发现节区头的<code>VirtualAddress</code>和<code>PointToRawData</code>是已经对齐好的，我们不需要写偏移函数来手动对齐。所以只需要</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">memmove(pAlloc + pSecheader-&gt;VirtualAddress, pBuf + pSecheader-&gt;PointerToRawData, pSecheader-&gt;Misc.VirtualSize);</span><br></pre></td></tr></table></figure>
+
+<p>就可将节区加载进内存。但后面要补的0该怎么办呢？其实早在初始化<code>pAlloc</code>时就已经将不加载数据的区域补了0，并不需要担心。</p>
+<p>加载完一个节区之后不要忘记进入下一个节区继续加载</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)pSecheader + (BYTE)(sizeof(IMAGE_SECTION_HEADER)));</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-加载重定位表"><a href="#4-加载重定位表" class="headerlink" title="4.加载重定位表"></a>4.加载重定位表</h3><p>加载完节区之后，我们还有重定位表和导入表没有处理。先处理重定位表。</p>
+<p>值得注意的是有的PE文件并<strong>不存在重定位表</strong>，若重定位表地址为00000000，则我们应直接跳过重定位表的处理；有的PE文件<strong>重定位表也不止一个</strong>，不过可选头中给的重定位表的大小是所有重定位表的总和，利用这个大小即可知道是否处理完了重定位表。</p>
+<p>先定位找到重定位表，并确定重定位表的大小</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PIMAGE_BASE_RELOCATION pBaseReloc = (PIMAGE_BASE_RELOCATION)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress + pAlloc);</span><br><span class="line"></span><br><span class="line">int SizeOfBaseReloc = pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;</span><br></pre></td></tr></table></figure>
+
+<p>这样就算有多个重定位表，我们也能找到各个重定位表的地址和大小了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pBaseReloc-&gt;VirtualAddress;</span><br><span class="line">pBaseReloc-&gt;SizeOfBlock;</span><br></pre></td></tr></table></figure>
+
+<p>通过这两个数据即可得到块的数量和每个块的数据。</p>
+<p>通过对重定位表的学习，我们已清楚重定位原理。先利用位操作得到每个块的前四位，判断每个块的类型，一般为3；并同时得到后12位的偏移地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WORD type = TypeOffset[i] &gt;&gt; 12;</span><br><span class="line">WORD offset = TypeOffset[i] &amp; 0x0FFF;</span><br></pre></td></tr></table></figure>
+
+<p>偏移地址加上<code>VirtualAddress</code>可得出一个地址，该地址存储着程序的硬编码地址，应读取该值之后减去<code>ImageBase</code>值，再加上实际加载地址pAlloc，得到实际重定位后的硬编码地址。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*((DWORD*)(offset + (pBaseReloc-&gt;VirtualAddress) + pAlloc)) - pNTheader-&gt;OptionalHeader.ImageBase + (DWORD)pAlloc;</span><br></pre></td></tr></table></figure>
+
+<p>我们将这个值覆盖存储到原先的硬编码地址，重定位就完成了。</p>
+<p><em>若还有多个重定位表，记得在加载完成后给<code>pBaseReloc</code>加上一个<code>SizeOfBlock</code></em></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pBaseReloc = (PIMAGE_BASE_RELOCATION)((PBYTE)pBaseReloc + pBaseReloc-&gt;SizeOfBlock);</span><br></pre></td></tr></table></figure>
+
+<p>接着回去加载下一个重定位表</p>
+<h3 id="5-加载导入表"><a href="#5-加载导入表" class="headerlink" title="5.加载导入表"></a>5.加载导入表</h3><p>重定位表处理完成后，就该处理导入表了。</p>
+<p>导入表拥有多个dll文件，dll文件中也有很多函数，要循环加载。</p>
+<p>先声明得到导入表的位置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PIMAGE_IMPORT_DESCRIPTOR pImport = (PIMAGE_IMPORT_DESCRIPTOR)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress + pAlloc);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>pImport-&gt;Name</code>就是dll文件的文件名字符串的地址，再加上加载地址<code>pAlloc</code>找到字符串，利用win32的LoadLibrary()函数加载dll文件进入内存。</p>
+<p>加载完dll之后就可以计算IAT和INT的地址，开始加载dll中的函数了。</p>
+<p><strong>IAT和INT下都有一个联合体(union)，为u1</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef struct _IMAGE_THUNK_DATA32 &#123;</span><br><span class="line">    union &#123;</span><br><span class="line">        DWORD ForwarderString;      // PBYTE </span><br><span class="line">        DWORD Function;             // PDWORD</span><br><span class="line">        DWORD Ordinal;</span><br><span class="line">        DWORD AddressOfData;        // PIMAGE_IMPORT_BY_NAME</span><br><span class="line">    &#125; u1;</span><br><span class="line">&#125; IMAGE_THUNK_DATA32;</span><br><span class="line">typedef IMAGE_THUNK_DATA32 * PIMAGE_THUNK_DATA32;</span><br></pre></td></tr></table></figure>
+
+<p>拥有四个元素，这四个元素公用了同一个<code>DWORD</code>，即为同一个值。但该值可拥有多种作用，便有了多种写法。</p>
+<p>在导入函数时，先判断一下函数是使用哪种方法导入的。</p>
+<p>若是用序号导入函数，则INT中存储的地址最高位即为1。故进行判断</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if (pINT-&gt;u1.AddressOfData &amp; IMAGE_ORDINAL_FLAG32)</span><br></pre></td></tr></table></figure>
+
+<p>若为真，则函数使用序号导入，而不使用字符串来查找函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, (LPCSTR)(pINT-&gt;u1.Ordinal)));</span><br></pre></td></tr></table></figure>
+
+<p>若为假，就可能需要使用字符串查找函数地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, pFucname-&gt;Name));</span><br></pre></td></tr></table></figure>
+
+<p>函数导入完毕，别忘了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pINT++;</span><br><span class="line">pIAT++;</span><br></pre></td></tr></table></figure>
+
+<p>导入完一个dll之后也要</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pImport++;</span><br></pre></td></tr></table></figure>
+
+<p><em>这里的+1是加了<code>IMAGE_IMPORT_DESCRIPTOR</code>一个结构体的大小，而不是一个字节，所以可以跳到下一个dll的导入表。</em></p>
+<h2 id="进入main-函数"><a href="#进入main-函数" class="headerlink" title="进入main()函数"></a>进入main()函数</h2><p>至此，已load完成。接下来就是利用函数指针，指向<code>EntryPoint</code>，即可调用主函数，运行程序。</p>
+<h2 id="Congratulation！"><a href="#Congratulation！" class="headerlink" title="Congratulation！"></a>Congratulation！</h2><p>顺利的话程序这样就已经运行起来了，恭喜。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://yoursite.com">Yourname</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://yoursite.com/2023/03/18/MyLoader/">http://yoursite.com/2023/03/18/MyLoader/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://yoursite.com" target="_blank">Now My Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/03/18/test/" title=""><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info"></div></div></a></div><div class="next-post pull-right"><a href="/2023/03/17/hello-world/" title="Hello World"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Hello World</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Yourname</div><div class="author-info__description">My blog</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/lo1see/lo1see.github.io" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PELoader"><span class="toc-text">PELoader</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PELoader%EF%BC%9F"><span class="toc-text">PELoader？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IDE%E9%80%89%E6%8B%A9"><span class="toc-text">IDE选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#main-%E5%87%BD%E6%95%B0"><span class="toc-text">main()函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84"><span class="toc-text">1.文件路径</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%AF%BB%E6%89%BE%E6%96%87%E4%BB%B6"><span class="toc-text">2.寻找文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%88%86%E9%85%8D%E2%80%9D%E7%A3%81%E7%9B%98%E2%80%9D"><span class="toc-text">3.分配”磁盘”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%A4%8D%E5%88%B6"><span class="toc-text">4.复制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Check%E4%B8%80%E4%B8%8BPE"><span class="toc-text">Check一下PE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LoadPE"><span class="toc-text">LoadPE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%9A%E4%BD%8D"><span class="toc-text">1.定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%88%86%E9%85%8D%E2%80%9D%E5%86%85%E5%AD%98%E2%80%9D"><span class="toc-text">2.分配”内存”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%8A%A0%E8%BD%BD%E8%8A%82%E5%8C%BA"><span class="toc-text">3.加载节区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%8A%A0%E8%BD%BD%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8"><span class="toc-text">4.加载重定位表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%8A%A0%E8%BD%BD%E5%AF%BC%E5%85%A5%E8%A1%A8"><span class="toc-text">5.加载导入表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E5%85%A5main-%E5%87%BD%E6%95%B0"><span class="toc-text">进入main()函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Congratulation%EF%BC%81"><span class="toc-text">Congratulation！</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/03/18/test/" title="无题">无题</a><time datetime="2023-03-17T16:33:07.623Z" title="发表于 2023-3-18 0:33:07">2023-3-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/03/18/MyLoader/" title="PELoader">PELoader</a><time datetime="2023-03-17T16:00:00.000Z" title="发表于 2023-3-18 0:00:00">2023-3-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/03/17/hello-world/" title="Hello World">Hello World</a><time datetime="2023-03-17T15:32:15.717Z" title="发表于 2023-3-17 23:32:15">2023-3-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Yourname</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
