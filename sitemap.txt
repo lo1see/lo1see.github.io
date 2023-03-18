@@ -1,7 +1,7 @@
-http://yoursite.com/link/index.html
-http://yoursite.com/categories/index.html
-http://yoursite.com/tags/index.html
-http://yoursite.com/2023/03/18/test/
-http://yoursite.com/2023/03/18/MyLoader/
-http://yoursite.com/2023/03/17/hello-world/
-http://yoursite.com/
+http://lo1see.github.io/link/index.html
+http://lo1see.github.io/categories/index.html
+http://lo1see.github.io/tags/index.html
+http://lo1see.github.io/2023/03/18/test/
+http://lo1see.github.io/2023/03/18/MyLoader/
+http://lo1see.github.io/2023/03/17/hello-world/
+http://lo1see.github.io/
