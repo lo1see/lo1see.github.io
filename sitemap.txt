@@ -1,7 +1,7 @@
+http://lo1see.github.io/link/index.html
 http://lo1see.github.io/2023/03/17/hello-world/
 http://lo1see.github.io/2023/06/29/LitCTF%20RE%E6%96%B9%E5%90%91WP/
 http://lo1see.github.io/about/index.html
-http://lo1see.github.io/link/index.html
 http://lo1see.github.io/categories/index.html
 http://lo1see.github.io/tags/index.html
 http://lo1see.github.io/2023/03/18/MyLoader/
