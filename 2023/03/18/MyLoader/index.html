@@ -8,7 +8,7 @@
         <meta name="description" content="lo1see的blog" />
         <meta name="keywords" content="" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-        <link rel="icon" href="/images/favicon.png" />
+        <link rel="icon" href="https://cdn.jsdelivr.net/gh/lo1see/Blog-image/avatar.png" />
         <script src="https://cdn.staticfile.org/vue/3.2.47/vue.global.prod.min.js"></script>
 <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.3.0/css/all.min.css" />
 <link rel="stylesheet" href="/css/fonts.min.css" />
@@ -162,7 +162,7 @@
     </div>
     
     <div class="content" v-pre>
-        <h1 id="PELoader"><a href="#PELoader" class="headerlink" title="PELoader"></a>PELoader</h1><h2 id="PELoader？"><a href="#PELoader？" class="headerlink" title="PELoader？"></a>PELoader？</h2><p>首先要清楚PELoader是干什么的。</p>
+        <h2 id="PELoader？"><a href="#PELoader？" class="headerlink" title="PELoader？"></a>PELoader？</h2><p>首先要清楚PELoader是干什么的。</p>
 <p>PELoader就相当于一个PE文件加载器，通过运行PELoader可以打开一个PE程序，该PE程序并不是系统为你打开的。运行起来的效果一般和双击是一样的。个人认为也是可以通过PEloader修改文件在内存中的数据的。</p>
 <p>通过写PEloader可以让我们更清楚的了解PE文件的结构，以及运行原理，这对于理解计算机底层是十分有帮助的。</p>
 <h2 id="IDE选择"><a href="#IDE选择" class="headerlink" title="IDE选择"></a>IDE选择</h2><p>推荐使用Visual Studio</p>
@@ -172,83 +172,112 @@
 <p>在main函数中</p>
 <h3 id="1-文件路径"><a href="#1-文件路径" class="headerlink" title="1.文件路径"></a>1.文件路径</h3><p>我们需要获得文件的地址，也就是文件路径字符串。</p>
 <h3 id="2-寻找文件"><a href="#2-寻找文件" class="headerlink" title="2.寻找文件"></a>2.寻找文件</h3><p>根据文件路径，通过<code>fopen()</code>函数找到文件，并给予权限。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if ((fp = fopen(file, &quot;rb&quot;)) == NULL)</span><br><span class="line">&#123;</span><br><span class="line">	printf(&quot;Open file fail&quot;);</span><br><span class="line">	exit(1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code>if ((fp = fopen(file, &quot;rb&quot;)) == NULL)
+&#123;
+    printf(&quot;Open file fail&quot;);
+    exit(1);
+&#125;
+</code></pre>
 <h3 id="3-分配”磁盘”"><a href="#3-分配”磁盘”" class="headerlink" title="3.分配”磁盘”"></a>3.分配”磁盘”</h3><p>计算出文件大小，并分配出一块等大小的内存区域(我声明为<code>pBuf</code>)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fseek(fp, 0, SEEK_END);</span><br><span class="line">last = ftell(fp);</span><br><span class="line">fsize = last;</span><br></pre></td></tr></table></figure>
-
+<pre><code>fseek(fp, 0, SEEK_END);
+last = ftell(fp);
+fsize = last;
+</code></pre>
 <h3 id="4-复制"><a href="#4-复制" class="headerlink" title="4.复制"></a>4.复制</h3><p>将文件的二进制信息全部复制到这块内存区域中</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fseek(fp, 0, SEEK_SET);</span><br><span class="line">pBuf = (PBYTE)malloc(fsize);</span><br><span class="line">fread(pBuf, fsize, 1, fp);</span><br></pre></td></tr></table></figure>
-
+<pre><code>fseek(fp, 0, SEEK_SET);
+pBuf = (PBYTE)malloc(fsize);
+fread(pBuf, fsize, 1, fp);
+</code></pre>
 <h2 id="Check一下PE"><a href="#Check一下PE" class="headerlink" title="Check一下PE"></a>Check一下PE</h2><p>在将文件读入<code>malloc()</code>给予的内存空间中后，我们拥有了对文件进行操作的权限。在此我将<code>pBuf</code>视为在磁盘中，稍后再将“磁盘”中的文件信息传入内存。</p>
 <p>对<code>pBuf</code>进行一个检查，check以下该文件是不是PE文件，若不是，则退出程序。</p>
 <p>判断PE文件方法即为判断DOS头中的<code>e_magic</code>和NT头中的<code>Signature</code>签名。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (pDOSheader-&gt;e_magic == IMAGE_DOS_SIGNATURE) &#123;</span><br><span class="line">	if (pNTheader-&gt;Signature == IMAGE_NT_SIGNATURE) &#123;</span><br><span class="line">		return true;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code>if (pDOSheader-&gt;e_magic == IMAGE_DOS_SIGNATURE) &#123;
+    if (pNTheader-&gt;Signature == IMAGE_NT_SIGNATURE) &#123;
+        return true;
+        &#125;
+    &#125;
+</code></pre>
 <h2 id="LoadPE"><a href="#LoadPE" class="headerlink" title="LoadPE"></a>LoadPE</h2><p>这里开始进行最主要的加载过程</p>
 <h3 id="1-定位"><a href="#1-定位" class="headerlink" title="1.定位"></a>1.定位</h3><p>利用传入的参数<code>pBuf</code>，得到DOS头，NT头，节区头并赋值</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PIMAGE_DOS_HEADER pDOSheader = (PIMAGE_DOS_HEADER)pBuf;//赋值DOS头</span><br><span class="line"></span><br><span class="line">PIMAGE_NT_HEADERS32 pNTheader = (PIMAGE_NT_HEADERS32)(pBuf + pDOSheader-&gt;e_lfanew);//赋值NT头</span><br><span class="line"></span><br><span class="line">PIMAGE_SECTION_HEADER pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)(pNTheader)+ 0x18 + (pNTheader-&gt;FileHeader.SizeOfOptionalHeader));//赋值节区头</span><br></pre></td></tr></table></figure>
+<pre><code>PIMAGE_DOS_HEADER pDOSheader = (PIMAGE_DOS_HEADER)pBuf;//赋值DOS头
 
+PIMAGE_NT_HEADERS32 pNTheader = (PIMAGE_NT_HEADERS32)(pBuf + pDOSheader-&gt;e_lfanew);//赋值NT头
+
+PIMAGE_SECTION_HEADER pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)(pNTheader)+ 0x18 + (pNTheader-&gt;FileHeader.SizeOfOptionalHeader));//赋值节区头
+</code></pre>
 <h3 id="2-分配”内存”"><a href="#2-分配”内存”" class="headerlink" title="2.分配”内存”"></a>2.分配”内存”</h3><p>通过<code>VirtualAlloc()</code>函数分配出一片和PE文件同样大的内存区域~，这个大小在可选头的<code>SizeOfImage</code>有保存。我们将这片区域<code>pAlloc</code>视为“内存”中。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PBYTE pAlloc = (PBYTE)VirtualAlloc(NULL, pNTheader-&gt;OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);</span><br></pre></td></tr></table></figure>
-
+<pre><code>PBYTE pAlloc = (PBYTE)VirtualAlloc(NULL, pNTheader-&gt;OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+</code></pre>
 <p>然后对这片区域利用<code>memset()</code>进行初始化。之后就可将在“磁盘”中的<code>pBuf</code>的文件头加载到“内存”区域的pAlloc。<code>pAlloc</code>的地址就是程序运行时的加载地址。</p>
 <h3 id="3-加载节区"><a href="#3-加载节区" class="headerlink" title="3.加载节区"></a>3.加载节区</h3><p>通过一二步之后，准备工作就完成了。接下来要开始循环加载节区信息。</p>
 <p>通过学习PE文件的知识，我们知道了磁盘文件或内存的节区大小必定为<code>FileAlignment</code>或<code>SectionAlignment</code>值的整数倍，若不为整数倍，计算机会自动补00对齐。</p>
 <p>通过010 editor观察文件易发现节区头的<code>VirtualAddress</code>和<code>PointToRawData</code>是已经对齐好的，我们不需要写偏移函数来手动对齐。所以只需要</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">memmove(pAlloc + pSecheader-&gt;VirtualAddress, pBuf + pSecheader-&gt;PointerToRawData, pSecheader-&gt;Misc.VirtualSize);</span><br></pre></td></tr></table></figure>
-
+<pre><code>memmove(pAlloc + pSecheader-&gt;VirtualAddress, pBuf + pSecheader-&gt;PointerToRawData, pSecheader-&gt;Misc.VirtualSize);
+</code></pre>
 <p>就可将节区加载进内存。但后面要补的0该怎么办呢？其实早在初始化<code>pAlloc</code>时就已经将不加载数据的区域补了0，并不需要担心。</p>
 <p>加载完一个节区之后不要忘记进入下一个节区继续加载</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)pSecheader + (BYTE)(sizeof(IMAGE_SECTION_HEADER)));</span><br></pre></td></tr></table></figure>
-
+<pre><code>pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)pSecheader + (BYTE)(sizeof(IMAGE_SECTION_HEADER)));
+</code></pre>
 <h3 id="4-加载重定位表"><a href="#4-加载重定位表" class="headerlink" title="4.加载重定位表"></a>4.加载重定位表</h3><p>加载完节区之后，我们还有重定位表和导入表没有处理。先处理重定位表。</p>
 <p>值得注意的是有的PE文件并<strong>不存在重定位表</strong>，若重定位表地址为00000000，则我们应直接跳过重定位表的处理；有的PE文件<strong>重定位表也不止一个</strong>，不过可选头中给的重定位表的大小是所有重定位表的总和，利用这个大小即可知道是否处理完了重定位表。</p>
 <p>先定位找到重定位表，并确定重定位表的大小</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PIMAGE_BASE_RELOCATION pBaseReloc = (PIMAGE_BASE_RELOCATION)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress + pAlloc);</span><br><span class="line"></span><br><span class="line">int SizeOfBaseReloc = pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;</span><br></pre></td></tr></table></figure>
+<pre><code>PIMAGE_BASE_RELOCATION pBaseReloc = (PIMAGE_BASE_RELOCATION)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress + pAlloc);
 
+int SizeOfBaseReloc = pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;
+</code></pre>
 <p>这样就算有多个重定位表，我们也能找到各个重定位表的地址和大小了。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pBaseReloc-&gt;VirtualAddress;</span><br><span class="line">pBaseReloc-&gt;SizeOfBlock;</span><br></pre></td></tr></table></figure>
-
+<pre><code>pBaseReloc-&gt;VirtualAddress;
+pBaseReloc-&gt;SizeOfBlock;
+</code></pre>
 <p>通过这两个数据即可得到块的数量和每个块的数据。</p>
 <p>通过对重定位表的学习，我们已清楚重定位原理。先利用位操作得到每个块的前四位，判断每个块的类型，一般为3；并同时得到后12位的偏移地址</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WORD type = TypeOffset[i] &gt;&gt; 12;</span><br><span class="line">WORD offset = TypeOffset[i] &amp; 0x0FFF;</span><br></pre></td></tr></table></figure>
-
+<pre><code>WORD type = TypeOffset[i] &gt;&gt; 12;
+WORD offset = TypeOffset[i] &amp; 0x0FFF;
+</code></pre>
 <p>偏移地址加上<code>VirtualAddress</code>可得出一个地址，该地址存储着程序的硬编码地址，应读取该值之后减去<code>ImageBase</code>值，再加上实际加载地址pAlloc，得到实际重定位后的硬编码地址。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*((DWORD*)(offset + (pBaseReloc-&gt;VirtualAddress) + pAlloc)) - pNTheader-&gt;OptionalHeader.ImageBase + (DWORD)pAlloc;</span><br></pre></td></tr></table></figure>
-
+<pre><code>*((DWORD*)(offset + (pBaseReloc-&gt;VirtualAddress) + pAlloc)) - pNTheader-&gt;OptionalHeader.ImageBase + (DWORD)pAlloc;
+</code></pre>
 <p>我们将这个值覆盖存储到原先的硬编码地址，重定位就完成了。</p>
 <p><em>若还有多个重定位表，记得在加载完成后给<code>pBaseReloc</code>加上一个<code>SizeOfBlock</code></em></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pBaseReloc = (PIMAGE_BASE_RELOCATION)((PBYTE)pBaseReloc + pBaseReloc-&gt;SizeOfBlock);</span><br></pre></td></tr></table></figure>
-
+<pre><code>pBaseReloc = (PIMAGE_BASE_RELOCATION)((PBYTE)pBaseReloc + pBaseReloc-&gt;SizeOfBlock);
+</code></pre>
 <p>接着回去加载下一个重定位表</p>
 <h3 id="5-加载导入表"><a href="#5-加载导入表" class="headerlink" title="5.加载导入表"></a>5.加载导入表</h3><p>重定位表处理完成后，就该处理导入表了。</p>
 <p>导入表拥有多个dll文件，dll文件中也有很多函数，要循环加载。</p>
 <p>先声明得到导入表的位置</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PIMAGE_IMPORT_DESCRIPTOR pImport = (PIMAGE_IMPORT_DESCRIPTOR)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress + pAlloc);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
+<pre><code>PIMAGE_IMPORT_DESCRIPTOR pImport = (PIMAGE_IMPORT_DESCRIPTOR)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress + pAlloc);
+</code></pre>
 <p><code>pImport-&gt;Name</code>就是dll文件的文件名字符串的地址，再加上加载地址<code>pAlloc</code>找到字符串，利用win32的LoadLibrary()函数加载dll文件进入内存。</p>
 <p>加载完dll之后就可以计算IAT和INT的地址，开始加载dll中的函数了。</p>
 <p><strong>IAT和INT下都有一个联合体(union)，为u1</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">typedef struct _IMAGE_THUNK_DATA32 &#123;</span><br><span class="line">    union &#123;</span><br><span class="line">        DWORD ForwarderString;      // PBYTE </span><br><span class="line">        DWORD Function;             // PDWORD</span><br><span class="line">        DWORD Ordinal;</span><br><span class="line">        DWORD AddressOfData;        // PIMAGE_IMPORT_BY_NAME</span><br><span class="line">    &#125; u1;</span><br><span class="line">&#125; IMAGE_THUNK_DATA32;</span><br><span class="line">typedef IMAGE_THUNK_DATA32 * PIMAGE_THUNK_DATA32;</span><br></pre></td></tr></table></figure>
-
+<pre><code>typedef struct _IMAGE_THUNK_DATA32 &#123;
+    union &#123;
+        DWORD ForwarderString;      // PBYTE 
+        DWORD Function;             // PDWORD
+        DWORD Ordinal;
+        DWORD AddressOfData;        // PIMAGE_IMPORT_BY_NAME
+    &#125; u1;
+&#125; IMAGE_THUNK_DATA32;
+typedef IMAGE_THUNK_DATA32 * PIMAGE_THUNK_DATA32;
+</code></pre>
 <p>拥有四个元素，这四个元素公用了同一个<code>DWORD</code>，即为同一个值。但该值可拥有多种作用，便有了多种写法。</p>
 <p>在导入函数时，先判断一下函数是使用哪种方法导入的。</p>
 <p>若是用序号导入函数，则INT中存储的地址最高位即为1。故进行判断</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if (pINT-&gt;u1.AddressOfData &amp; IMAGE_ORDINAL_FLAG32)</span><br></pre></td></tr></table></figure>
-
+<pre><code>if (pINT-&gt;u1.AddressOfData &amp; IMAGE_ORDINAL_FLAG32)
+</code></pre>
 <p>若为真，则函数使用序号导入，而不使用字符串来查找函数</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, (LPCSTR)(pINT-&gt;u1.Ordinal)));</span><br></pre></td></tr></table></figure>
-
+<pre><code>pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, (LPCSTR)(pINT-&gt;u1.Ordinal)));
+</code></pre>
 <p>若为假，就可能需要使用字符串查找函数地址</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, pFucname-&gt;Name));</span><br></pre></td></tr></table></figure>
-
+<pre><code>pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, pFucname-&gt;Name));
+</code></pre>
 <p>函数导入完毕，别忘了</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pINT++;</span><br><span class="line">pIAT++;</span><br></pre></td></tr></table></figure>
-
+<pre><code>pINT++;
+pIAT++;
+</code></pre>
 <p>导入完一个dll之后也要</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pImport++;</span><br></pre></td></tr></table></figure>
-
+<pre><code>pImport++;
+</code></pre>
 <p><em>这里的+1是加了<code>IMAGE_IMPORT_DESCRIPTOR</code>一个结构体的大小，而不是一个字节，所以可以跳到下一个dll的导入表。</em></p>
 <h2 id="进入main-函数"><a href="#进入main-函数" class="headerlink" title="进入main()函数"></a>进入main()函数</h2><p>至此，已load完成。接下来就是利用函数指针，指向<code>EntryPoint</code>，即可调用主函数，运行程序。</p>
 <h2 id="Congratulation！"><a href="#Congratulation！" class="headerlink" title="Congratulation！"></a>Congratulation！</h2><p>顺利的话程序这样就已经运行起来了，恭喜。</p>
@@ -272,7 +301,7 @@
     <div id="footer-wrap">
         <div>
             &copy;
-            2022 - 2023 lo1see
+            2023 - 2023 lo1see
             <span id="footer-icon">
                 <i class="fa-solid fa-font-awesome fa-fw"></i>
             </span>
