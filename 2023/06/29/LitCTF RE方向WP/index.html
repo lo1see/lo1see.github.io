@@ -3,7 +3,7 @@
 <html lang="zh-CN">
     <head>
         <meta charset="utf-8" />
-        <title>Hello World | lo1see</title>
+        <title>LitCTF  RE方向 WP | lo1see</title>
         <meta name="author" content="lo1see" />
         <meta name="description" content="lo1see的blog" />
         <meta name="keywords" content="" />
@@ -148,36 +148,86 @@
                 <div id="main" v-show="!loading">
                     <div class="article">
     <div>
-        <h1>Hello World</h1>
+        <h1>LitCTF  RE方向 WP</h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <i class="fa-solid fa-calendar fa-fw"></i>
             </span>
-            2023/3/17
+            2023/6/29
         </span>
         
         
     </div>
     
     <div class="content" v-pre>
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. </p>
+        <p>主要从第四题开始有新知识点</p>
 <span id="more"></span>
 
-<p>Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="bash">$ hexo new &quot;My New Post&quot;
+<h2 id="世界上最棒的程序员"><a href="#世界上最棒的程序员" class="headerlink" title="世界上最棒的程序员"></a>世界上最棒的程序员</h2><p>打开ida就能看到flag</p>
+<h2 id="ez-XOR"><a href="#ez-XOR" class="headerlink" title="ez_XOR"></a>ez_XOR</h2><p>简单的异或，静态能看到异或的是9</p>
+<h2 id="enbase64"><a href="#enbase64" class="headerlink" title="enbase64"></a>enbase64</h2><p>base64变表，变表代码CV过来就能用</p>
+<h2 id="snake"><a href="#snake" class="headerlink" title="snake"></a>snake</h2><p>附件下载下来是个pyc文件，直接用uncomplyed6发现出不来，提示magic nuber错误。之后上网查一下各版本python的magic number试就试出来可以uncomplyed6反编译了</p>
+<p><a target="_blank" rel="noopener" href="https://imgse.com/i/p9cDMTI"><img src="https://s1.ax1x.com/2023/05/14/p9cDMTI.png" alt="p9cDMTI.png"></a></p>
+<p>进入.py一眼就能看到flag</p>
+<h2 id="For-Aiur"><a href="#For-Aiur" class="headerlink" title="For Aiur"></a>For Aiur</h2><p>又是一个python逆向，先用pyinstxtractor反编译出.pyc，发现uncomplyed6出不来，我就去了<a target="_blank" rel="noopener" href="https://tool.lu/pyc/%E5%9C%A8%E7%BA%BF%E5%8F%8D%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E5%8F%8D%E7%BC%96%E8%AF%91%E5%87%BA%E6%9D%A5%E4%BA%86%E3%80%82">https://tool.lu/pyc/在线反编译工具反编译出来了。</a></p>
+<p><a target="_blank" rel="noopener" href="https://imgse.com/i/p9cDT1O"><img src="https://s1.ax1x.com/2023/05/14/p9cDT1O.png" alt="p9cDT1O.png"></a></p>
+<p>观察代码发现有个ch库引入了check函数，再看眼函数整体可以发现</p>
+<p><a target="_blank" rel="noopener" href="https://imgse.com/i/p9crn3T"><img src="https://s1.ax1x.com/2023/05/14/p9crn3T.png" alt="p9crn3T.png"></a></p>
+<p>只有这一个地方使用了check()，其他代码也都很正常，那么关键就在这个check函数了。</p>
+<p>回到pyinstxtractor反编译出来的文件夹，搜索ch可以找到ch.pyc</p>
+<p><a target="_blank" rel="noopener" href="https://imgse.com/i/p9crlDJ"><img src="https://s1.ax1x.com/2023/05/14/p9crlDJ.png" alt="p9crlDJ.png"></a></p>
+<p>使用uncomplyed6即可得到ch.py，打开直接就能看到加密很简单的flag</p>
+<h2 id="程序和人有一个能跑就行了"><a href="#程序和人有一个能跑就行了" class="headerlink" title="程序和人有一个能跑就行了"></a>程序和人有一个能跑就行了</h2><p>拖进ida简单分析一下，可以发现一个很明显的RC4加密函数</p>
+<p><a target="_blank" rel="noopener" href="https://imgse.com/i/p9crLxU"><img src="https://s1.ax1x.com/2023/05/14/p9crLxU.png" alt="p9crLxU.png"></a></p>
+<p>Buf1是RC4加密结果，写脚本嗦一下就可以轻松得到flag，不过是fake的</p>
+<pre><code class="python">res_l = [0x8D, 0x6C, 0x85, 0x76, 0x32, 0x72, 0xB7, 0x40, 0x88, 0x7E, 0x95, 0xEE, 0xC5, 0xED, 0x2E, 0x71, 0x37, 0xF1, 0x4A, 0x99, 0x35, 0x18, 0xA7, 0xB0, 0x00, 0x96, 0xB7]
+res_b = bytes(res_l)
+seed = b&quot;litctf&quot;
+
+enc = ARC4.new(seed)
+inp = enc.decrypt(res_b)
+print(inp)
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="bash">$ hexo server
+<p>然后接着分析代码。运行过几次之后发现输入错误只会显示wrong？输入正确只会显示right？，与ida的代码逻辑不相符</p>
+<p><a target="_blank" rel="noopener" href="https://imgse.com/i/p9cyM79"><img src="https://s1.ax1x.com/2023/05/14/p9cyM79.png" alt="p9cyM79.png"></a></p>
+<p>这里不是if else，而是只有if，那么逻辑上讲right是一定会输出的，但事实没有。那么if分支中就有些异样了。换成汇编进入动态分析</p>
+<p><img src="https://s1.imagehub.cc/images/2023/05/14/QQ20230514140325.png" alt="QQ20230514140325.png"></p>
+<p>发现走过了sub_475190却依旧在执行一些ida没有反编译出来的代码。继续往下执行可以看到</p>
+<p><img src="https://s1.imagehub.cc/images/2023/05/14/QQ20230514140446.png" alt="QQ20230514140446.png"></p>
+<p>把这段16进制放入脚本执行RC4解密，就可以得到flag了</p>
+<pre><code class="python">from Crypto.Cipher import ARC4
+
+res_l = [0x8D, 0x6C, 0x85, 0x76, 0x32, 0x72, 0xB7, 0x43, 0x85, 0x7B, 0x85, 0xDE, 0xC1, 0xFB, 0x2E, 0x64, 0x07, 0xC8, 0x5F, 0x9A, 0x35, 0x18, 0xAD, 0xB5, 0x15, 0x92, 0xBE, 0x1B, 0x88]
+res_b = bytes(res_l)
+seed = b&quot;litctf&quot;
+
+enc = ARC4.new(seed)
+inp = enc.decrypt(res_b)
+print(inp)
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="bash">$ hexo generate
+<p>问了下可能是C++异常处理的知识点</p>
+<h2 id="debase64"><a href="#debase64" class="headerlink" title="debase64"></a>debase64</h2><p>拖进ida先静态分析，能看到输入20个字符到v15，在sub_401520函数将v15转换到了v4，再拿v4和v6-v14的每个字节进行比较。根据题目和进入sub_401520也可以基本确定sub_401520是个解base64的函数。</p>
+<p><img src="https://s1.imagehub.cc/images/2023/05/14/QQ20230514140834.png" alt="QQ20230514140834.png"></p>
+<p>之后进入动态调试，步过sub_401520的时候发现这不是普通的base64。动态分析后能发现，原理是把base64解密顺序反过来了，用第四个字符左移两位，第三个字符右移四位这样。故只需写个加密脚本，手动把顺序倒过来就好。因为flag后有3个“&#x3D;”，最后一位根据hint爆破即可。</p>
+<pre><code>import base64
+
+list = [0x46, 0xED, 0x18, 0x96, 0x56, 0x9E, 0xD2, 0x72, 0xB2, 0xB3, 0x80, 0x70, 0xFF]
+list_b = bytes(list)
+print(base64.b64encode(list_b))
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="bash">$ hexo deploy
+<p>Ru0Yllae0nKys4Bw&#x2F;w&#x3D;&#x3D;   –&gt;&gt;   Y0uReallyKn0wB4s&#x2F;w&#x3D;&#x3D;   –&gt;&gt;   Y0uReallyKn0wB4s?&#x3D;&#x3D;&#x3D;</p>
+<pre><code>import hashlib
+
+key = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;
+for i in key:
+    str1 = &quot;Y0uReallyKn0wB4s&quot; + i + &quot;===&quot;
+    if hashlib.md5(str1.encode(&#39;utf-8&#39;)).hexdigest() == &quot;5a3ebb487ad0046e52db00570339aace&quot;:
+        print(str1)
+        break
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p>得到Y0uReallyKn0wB4s3&#x3D;&#x3D;&#x3D;</p>
 
     </div>
     
