@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog - 标签 - lo1see</title>
+    <link>http://localhost:1313/tags/blog/</link>
+    <description>随手简记</description>
+    <generator>Hugo 0.139.4 &amp; FixIt v0.3.16</generator>
+    <language>zh-CN</language>
+    <managingEditor>2296161885@qq.com (lo1see)</managingEditor>
+    <webMaster>2296161885@qq.com (lo1see)</webMaster>
+    <copyright>© 2024, 怜音 - lo1see</copyright>
+    <lastBuildDate>Mon, 20 Feb 2023 20:14:22 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>My First Post</title>
+      <link>http://localhost:1313/posts/first_post/</link>
+      <pubDate>Mon, 20 Feb 2023 20:14:22 +0800</pubDate><author>2296161885@qq.com (lo1see)</author>
+      <guid>http://localhost:1313/posts/first_post/</guid>
+      <category domain="http://localhost:1313/categories/blog/">Blog</category>
+      <description>&lt;p&gt;A blog (a truncation of &amp;ldquo;weblog&amp;rdquo;) is an informational website published on the World Wide Web consisting of discrete, often informal diary-style text entries (posts). Posts are typically displayed in reverse chronological order so that the most recent post appears first, at the top of the web page. Until 2009, blogs were usually the work of a single individual,[citation needed] occasionally of a small group, and often covered a single subject or topic. In the 2010s, &amp;ldquo;multi-author blogs&amp;rdquo; (MABs) emerged, featuring the writing of multiple authors and sometimes professionally edited. MABs from newspapers, other media outlets, universities, think tanks, advocacy groups, and similar institutions account for an increasing quantity of blog traffic. The rise of Twitter and other &amp;ldquo;microblogging&amp;rdquo; systems helps integrate MABs and single-author blogs into the news media. Blog can also be used as a verb, meaning to maintain or add content to a blog.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

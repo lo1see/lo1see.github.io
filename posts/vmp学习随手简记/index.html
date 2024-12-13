@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>VMP学习随手简记 - lo1see</title><meta name="author" content="lo1see">
+<meta name="description" content="VMP入口处
+早期：
+1 2 push xxx jmp xxx 现在：
+1 2 push xxx call xxx VMP局部虚拟机，更重函数保护以及函数调用之间的保护，统称函数隐匿性保护
+函数隐匿性：
+无缝跳转 抽象化 虚拟机参数转移 抽象化 虚拟机漂移 抽象化 虚拟机合流 抽象化 对付流程结构，函数调用流程结构：
+">
+  <meta itemprop="name" content="VMP学习随手简记">
+  <meta itemprop="description" content="VMP入口处
+早期：
+1 2 push xxx jmp xxx 现在：
+1 2 push xxx call xxx VMP局部虚拟机，更重函数保护以及函数调用之间的保护，统称函数隐匿性保护
+函数隐匿性：
+无缝跳转 抽象化 虚拟机参数转移 抽象化 虚拟机漂移 抽象化 虚拟机合流 抽象化 对付流程结构，函数调用流程结构：">
+  <meta itemprop="datePublished" content="2024-12-12T16:46:32+08:00">
+  <meta itemprop="dateModified" content="2024-12-12T16:46:32+08:00">
+  <meta itemprop="wordCount" content="322"><meta property="og:url" content="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="VMP学习随手简记">
+  <meta property="og:description" content="VMP入口处
+早期：
+1 2 push xxx jmp xxx 现在：
+1 2 push xxx call xxx VMP局部虚拟机，更重函数保护以及函数调用之间的保护，统称函数隐匿性保护
+函数隐匿性：
+无缝跳转 抽象化 虚拟机参数转移 抽象化 虚拟机漂移 抽象化 虚拟机合流 抽象化 对付流程结构，函数调用流程结构：">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-12T16:46:32+08:00">
+    <meta property="article:modified_time" content="2024-12-12T16:46:32+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="VMP学习随手简记">
+  <meta name="twitter:description" content="VMP入口处
+早期：
+1 2 push xxx jmp xxx 现在：
+1 2 push xxx call xxx VMP局部虚拟机，更重函数保护以及函数调用之间的保护，统称函数隐匿性保护
+函数隐匿性：
+无缝跳转 抽象化 虚拟机参数转移 抽象化 虚拟机漂移 抽象化 虚拟机合流 抽象化 对付流程结构，函数调用流程结构：">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/" title="VMP学习随手简记 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/" title="加密与解密系统篇笔记" /><link rel="next" type="text/html" href="http://localhost:1313/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" title="逆核——13章_PE文件格式" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/index.md" title="VMP学习随手简记 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "VMP学习随手简记",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0\/"
+    },"genre": "posts","wordcount":  322 ,
+    "url": "http:\/\/localhost:1313\/posts\/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0\/","datePublished": "2024-12-12T16:46:32+08:00","dateModified": "2024-12-12T16:46:32+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "lo1see"
+      },"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>VMP学习随手简记</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/avater.png" alt="lo1see" data-title="lo1see" width="20" height="20" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;lo1see</span></span></div><div class="post-meta-line"><span title="发布于 2024-12-12 16:46:32"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="121246-1212-1212">121246-1212-1212</time></span>&nbsp;<span title="322 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 400 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 1 分钟</span>&nbsp;</div>
+    </div><div class="content" id="content"><p>VMP入口处</p>
+<p>早期：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">push xxx
+</span></span><span class="line"><span class="cl">jmp xxx</span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">push xxx
+</span></span><span class="line"><span class="cl">call xxx</span></span></code></pre></td></tr></table>
+</div>
+</div><p>VMP局部虚拟机，更重函数保护以及函数调用之间的保护，统称函数隐匿性保护</p>
+<p>函数隐匿性：</p>
+<ul>
+<li>无缝跳转                         抽象化</li>
+<li>虚拟机参数转移              抽象化</li>
+<li>虚拟机漂移                     抽象化</li>
+<li>虚拟机合流                     抽象化</li>
+</ul>
+<p>对付流程结构，函数调用流程结构：</p>
+<ul>
+<li>数据追踪，数据真实化                           数据还原是抽象的，是具有不稳性状态</li>
+<li>所处的栈是真实的                                  数据追踪可以有效的利用数据流追踪</li>
+<li>精确寄存器是真实的 <code>esp, ebp</code>             数据追踪可以有效的利用数据流追踪</li>
+<li>函数的返回地址是真实的                       数据追踪可以有效的利用数据流追踪</li>
+</ul>
+<p>数据追踪：</p>
+<ul>
+<li>上下文追踪，追踪特征，<code>pushfd test</code>之间的调用关系 &ndash;&gt; 指定一个逻辑流程结构</li>
+<li>精确寄存器      &ndash;&gt;      函数的调用变化</li>
+<li>栈结构是真实的      &ndash;&gt;      是可以定位出参数，用参数推导出这个函数的大致作用</li>
+<li>ESP      &ndash;&gt;      定位虚拟机的退出和进入</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-12 16:46:32">更新于 121246-1212-1212&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/" data-title="VMP学习随手简记"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/" data-title="VMP学习随手简记"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/" class="post-nav-item" rel="prev" title="加密与解密系统篇笔记"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>加密与解密系统篇笔记</a><a href="/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" class="post-nav-item" rel="next" title="逆核——13章_PE文件格式">逆核——13章_PE文件格式<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

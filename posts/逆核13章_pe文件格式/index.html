@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>逆核——13章_PE文件格式 - lo1see</title><meta name="author" content="lo1see">
+<meta name="description" content="13章 PE文件格式 DOS头 IMAGE_DOS_HEADER "><meta name="keywords" content='PE, 文件结构'>
+  <meta itemprop="name" content="逆核——13章_PE文件格式">
+  <meta itemprop="description" content="13章 PE文件格式 DOS头 IMAGE_DOS_HEADER">
+  <meta itemprop="datePublished" content="2024-12-12T17:07:07+08:00">
+  <meta itemprop="dateModified" content="2024-12-12T17:07:07+08:00">
+  <meta itemprop="wordCount" content="2199">
+  <meta itemprop="keywords" content="PE,文件结构"><meta property="og:url" content="http://localhost:1313/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="逆核——13章_PE文件格式">
+  <meta property="og:description" content="13章 PE文件格式 DOS头 IMAGE_DOS_HEADER">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-12T17:07:07+08:00">
+    <meta property="article:modified_time" content="2024-12-12T17:07:07+08:00">
+    <meta property="article:tag" content="PE">
+    <meta property="article:tag" content="文件结构">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="逆核——13章_PE文件格式">
+  <meta name="twitter:description" content="13章 PE文件格式 DOS头 IMAGE_DOS_HEADER">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" title="逆核——13章_PE文件格式 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/" title="VMP学习随手简记" /><link rel="next" type="text/html" href="http://localhost:1313/posts/%E9%80%86%E6%A0%B816%E7%AB%A0_%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D/" title="逆核——16章_基址重定位" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/index.md" title="逆核——13章_PE文件格式 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "逆核——13章_PE文件格式",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F\/"
+    },"genre": "posts","keywords": "PE, 文件结构","wordcount":  2199 ,
+    "url": "http:\/\/localhost:1313\/posts\/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F\/","datePublished": "2024-12-12T17:07:07+08:00","dateModified": "2024-12-12T17:07:07+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "lo1see"
+      },"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>逆核——13章_PE文件格式</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/avater.png" alt="lo1see" data-title="lo1see" width="20" height="20" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;lo1see</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/pe%E6%96%87%E4%BB%B6/" class="post-category" title="分类 - PE文件"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> PE文件</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-12 17:07:07"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="12127-1212-1212">12127-1212-1212</time></span>&nbsp;<span title="2199 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 2200 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 5 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#dos头"><strong>DOS头</strong></a>
+      <ul>
+        <li><a href="#image_dos_header"><strong>IMAGE_DOS_HEADER</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#dos存根"><strong>DOS存根</strong></a></li>
+    <li><a href="#nt头image_nt_headers"><strong>NT头</strong>：IMAGE_NT_HEADERS</a>
+      <ul>
+        <li><a href="#nt头文件头image_file_header"><strong>NT头：文件头</strong>——IMAGE_FILE_HEADER</a></li>
+        <li><a href="#nt头可选头image_optional_header"><strong>NT头：可选头</strong>——IMAGE_OPTIONAL_HEADER</a></li>
+      </ul>
+    </li>
+    <li><a href="#节区头image_section_header">节区头——IMAGE_SECTION_HEADER</a></li>
+    <li><a href="#rva-to-raw">RVA to RAW</a></li>
+    <li><a href="#image_import_descriptor">IMAGE_IMPORT_DESCRIPTOR</a></li>
+    <li><a href="#image_export_directory">IMAGE_EXPORT_DIRECTORY</a></li>
+    <li><a href="#基址重定位偏移表image_base_relocation">基址重定位偏移表——IMAGE_BASE_RELOCATION</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="13章--pe文件格式" class="heading-element"><span><strong>13章  PE文件格式</strong></span>
+  <a href="#13%e7%ab%a0--pe%e6%96%87%e4%bb%b6%e6%a0%bc%e5%bc%8f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="dos头" class="heading-element"><span><strong>DOS头</strong></span>
+  <a href="#dos%e5%a4%b4" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h3 id="image_dos_header" class="heading-element"><span><strong>IMAGE_DOS_HEADER</strong></span>
+  <a href="#image_dos_header" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212171007206.png" alt="image-20241212171007206" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212171007206.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212171007206.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212171007206.png?size=large 2x" data-title="image-20241212171007206" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>e_magic：DOS签名</p>
+<p>e_lfanew：只是NT头的偏移（根据不同的文件拥有可变值）</p>
+<h2 id="dos存根" class="heading-element"><span><strong>DOS存根</strong></span>
+  <a href="#dos%e5%ad%98%e6%a0%b9" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>40~4D区域是16位汇编指令。Windows下不会运行该命令。</p>
+<h2 id="nt头image_nt_headers" class="heading-element"><span><strong>NT头</strong>：IMAGE_NT_HEADERS</span>
+  <a href="#nt%e5%a4%b4image_nt_headers" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165704463.png" alt="image-20241212165704463" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165704463.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165704463.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165704463.png?size=large 2x" data-title="image-20241212165704463" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>Signature：签名，值为50 45 00 00（PE）</p>
+<p>IMAGE_FILE_HEADER FileHeader：文件头</p>
+<p>IMAGE_OPTIONAL _HEADER32 OptionalHeader：可选头</p>
+<h3 id="nt头文件头image_file_header" class="heading-element"><span><strong>NT头：文件头</strong>——IMAGE_FILE_HEADER</span>
+  <a href="#nt%e5%a4%b4%e6%96%87%e4%bb%b6%e5%a4%b4image_file_header" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>文件头是表现文件大致属性的IMAGE_FILE_HEAD结构体</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165631487.png" alt="image-20241212165631487" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165631487.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165631487.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165631487.png?size=large 2x" data-title="image-20241212165631487" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>#1.Machine：每个CPU都拥有唯一的Machine码</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165719203.png" alt="image-20241212165719203" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165719203.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165719203.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165719203.png?size=large 2x" data-title="image-20241212165719203" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165732046.png" alt="image-20241212165732046" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165732046.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165732046.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165732046.png?size=large 2x" data-title="image-20241212165732046" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>#2.NumberOfSections：指出文件中存在的节区数量。该值一定要大于0，且当定义的节区数量与实际节区不同时，将发生运行错误。</p>
+<p>#3.SizeOfOptionalHeader：指出IMAGE_OPTIONAL_HEADER32结构体的长度。IMAGE_OPTIONAL_HEADER32结构体大小已经确定。但Windows的PE装载器需要查看IMAGE_FILE_HEADER的SizeOfOptionalHeader值，从而识别出IMAGE_OPTIONAL_HEADER32结构体的大小</p>
+<p>#4.Characteristics：该字段用于表示文件的属性，文件是否是可运行的形态、是否位DLL文件等信息，以bit OR形式组合起来。</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165748781.png" alt="image-20241212165748781" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165748781.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165748781.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165748781.png?size=large 2x" data-title="image-20241212165748781" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165801429.png" alt="image-20241212165801429" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165801429.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165801429.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165801429.png?size=large 2x" data-title="image-20241212165801429" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h3 id="nt头可选头image_optional_header" class="heading-element"><span><strong>NT头：可选头</strong>——IMAGE_OPTIONAL_HEADER</span>
+  <a href="#nt%e5%a4%b4%e5%8f%af%e9%80%89%e5%a4%b4image_optional_header" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>以下值是文件运行必须的，设置错误将导致文件无法正常运行</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165818143.png" alt="image-20241212165818143" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165818143.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165818143.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165818143.png?size=large 2x" data-title="image-20241212165818143" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165830990.png" alt="image-20241212165830990" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165830990.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165830990.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165830990.png?size=large 2x" data-title="image-20241212165830990" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>#1.Magic:为IMAGE_OPTIONAL_HEADER32结构体时，Magic码为10B；为IMAGE_OPTIONAL_HEADER64结构体时，Magic码为20B。</p>
+<p>#2.AddressOfEntryPoint：持有EP的RVA值。指出程序最先执行的代码起始地址。</p>
+<p>#3.ImageBase：指出文件的优先装入地址。（EIP = ImageBase + AddressOfEntryPoint）</p>
+<p>#4.SectionAlignment，FileAlignment：FileAlignment制定了节区在磁盘文件中的最小单位，而SectionAlignment指定了节区在内存中的最小单位。磁盘文件或内存的节区大小必定为FileAlignment或SectionAlignment值的整数倍。</p>
+<p>#5.SizeOfImage：指定了PE Image在虚拟内存中所占空间的大小。一般而言，文件的大小与加载到内存中的大小是不同的。</p>
+<p>#6.SizeOfHeaders：指出整个PE头的大小（该值必须是FileAlignment的整数倍）</p>
+<p>#7.Subsystem：用来区分系统驱动文件和普通的可执行文件。</p>
+<p>#8.NumberOfRvaAndSizes.用来指定DataDirectory（IMAGE_OPTIONAL_HEADER32结构体的最后一个成员）数组的个数。PE装载器通过查看NumberOfRvaAndSizes值来识别数组大小，换言之，数组大小也可能不是16。</p>
+<p>#9.DataDirectory：是由IMAGE_DATA_DIRECTORY结构体组成的数组，数组每项都有被定义的值。</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165846883.png" alt="image-20241212165846883" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165846883.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165846883.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165846883.png?size=large 2x" data-title="image-20241212165846883" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h2 id="节区头image_section_header" class="heading-element"><span>节区头——IMAGE_SECTION_HEADER</span>
+  <a href="#%e8%8a%82%e5%8c%ba%e5%a4%b4image_section_header" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165910607.png" alt="image-20241212165910607" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165910607.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165910607.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212165910607.png?size=large 2x" data-title="image-20241212165910607" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>#1.VirtualSize：内存中节区所占大小</p>
+<p>#2.<font color = "red">VirtualAddress</font>：（不带有任何值）内存中节区起始地址（RVA）</p>
+<p>#3.SizeOfRawData：磁盘文件中节区所占大小</p>
+<p>#4.<font color = "red">PointerToRawData</font>：（不带有任何值）磁盘文件中节区起始位置</p>
+<p>#5.Characteritics：节区属性（bit OR）</p>
+<p><font color = "red">VirtualAddress与PointerToRawData不带有任何值，分别由（定义在IMAGE_OPTIONAL_HEADER32中的）SectionAlignment与FileAlegnment确定。</font></p>
+<h2 id="rva-to-raw" class="heading-element"><span>RVA to RAW</span>
+  <a href="#rva-to-raw" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">RAW - PointerToRawData = RVA - VirtualAddress
+</span></span><span class="line"><span class="cl">                   RAW = RVA - VirtualAddress + PointerToRawData</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="image_import_descriptor" class="heading-element"><span>IMAGE_IMPORT_DESCRIPTOR</span>
+  <a href="#image_import_descriptor" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170016551.png" alt="image-20241212170016551" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170016551.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170016551.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170016551.png?size=large 2x" data-title="image-20241212170016551" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>IMAGE_IMPORT_DESCRIPTOR结构体中记录着PE文件要导入哪些库文件</p>
+<p>#1.OriginalFirstThunk：INT的地址（RVA）</p>
+<p>#2.Name：库名称字符串的地址（RVA）</p>
+<p>#3.FirstThunk：IAT的地址（RVA）</p>
+<p>导入多少库就存在多少个IMAGE_IMPORT_DESCRIPTOR结构体</p>
+<h2 id="image_export_directory" class="heading-element"><span>IMAGE_EXPORT_DIRECTORY</span>
+  <a href="#image_export_directory" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170050800.png" alt="image-20241212170050800" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170050800.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170050800.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170050800.png?size=large 2x" data-title="image-20241212170050800" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>#1.NumberOfFunctions：实际Export函数的个数</p>
+<p>#2.NumberOfNames：Export函数中具名的函数个数</p>
+<p>#3.AddressOfFunctions：Export函数地址数组（数组元素个数 = NumberOfFunctions）</p>
+<p>#4.AddressOfNames：函数名称地址数组（数组元素个数 - NumberOfNames）</p>
+<p>#5.AddressOfNameOrdinals：Ordinal地址数组（数组元素个数 = NumberOfNames）</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170233131.png" alt="image-20241212170233131" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170233131.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170233131.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170233131.png?size=large 2x" data-title="image-20241212170233131" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170226394.png" alt="image-20241212170226394" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170226394.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170226394.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170226394.png?size=large 2x" data-title="image-20241212170226394" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h2 id="基址重定位偏移表image_base_relocation" class="heading-element"><span>基址重定位偏移表——IMAGE_BASE_RELOCATION</span>
+  <a href="#%e5%9f%ba%e5%9d%80%e9%87%8d%e5%ae%9a%e4%bd%8d%e5%81%8f%e7%a7%bb%e8%a1%a8image_base_relocation" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170311852.png" alt="image-20241212170311852" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170311852.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170311852.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212170311852.png?size=large 2x" data-title="image-20241212170311852" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>#1.VirtualAddress：是一个基准地址（Base Address），实际是RVA值。</p>
+<p>#2.SizeOfBlock：指重定位块的大小。</p>
+<p>#3.TypeOffset数组：不是结构体成员，是以注释形式存在的，表示在该结构体之下会出现WORD类型的数组，并且该数组元素的值就是硬编码在程序中的地址偏移</p>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-12 17:07:07">更新于 12127-1212-1212&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" data-title="逆核——13章_PE文件格式" data-hashtags="PE,文件结构"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" data-hashtag="PE"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/%E9%80%86%E6%A0%B813%E7%AB%A0_pe%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" data-title="逆核——13章_PE文件格式"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/pe/" class="post-tag" title="标签 - PE">PE</a><a href="/tags/%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/" class="post-tag" title="标签 - 文件结构">文件结构</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/" class="post-nav-item" rel="prev" title="VMP学习随手简记"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>VMP学习随手简记</a><a href="/posts/%E9%80%86%E6%A0%B816%E7%AB%A0_%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D/" class="post-nav-item" rel="next" title="逆核——16章_基址重定位">逆核——16章_基址重定位<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

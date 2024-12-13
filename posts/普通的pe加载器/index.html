@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>PE文件加载器 - lo1see</title><meta name="author" content="lo1see">
+<meta name="description" content="PELoader PELoader？ 首先要清楚PELoader是干什么的。
+">
+  <meta itemprop="name" content="PE文件加载器">
+  <meta itemprop="description" content="PELoader PELoader？ 首先要清楚PELoader是干什么的。">
+  <meta itemprop="datePublished" content="2024-12-12T16:29:37+08:00">
+  <meta itemprop="dateModified" content="2024-12-12T16:29:37+08:00">
+  <meta itemprop="wordCount" content="2630"><meta property="og:url" content="http://localhost:1313/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="PE文件加载器">
+  <meta property="og:description" content="PELoader PELoader？ 首先要清楚PELoader是干什么的。">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-12T16:29:37+08:00">
+    <meta property="article:modified_time" content="2024-12-12T16:29:37+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PE文件加载器">
+  <meta name="twitter:description" content="PELoader PELoader？ 首先要清楚PELoader是干什么的。">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/" title="PE文件加载器 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/%E5%93%88%E5%96%BD%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2/" title="哈喽，我的博客" /><link rel="next" type="text/html" href="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/" title="Requests库学习" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/index.md" title="PE文件加载器 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "PE文件加载器",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8\/"
+    },"genre": "posts","wordcount":  2630 ,
+    "url": "http:\/\/localhost:1313\/posts\/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8\/","datePublished": "2024-12-12T16:29:37+08:00","dateModified": "2024-12-12T16:29:37+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "lo1see"
+      },"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>PE文件加载器</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/avater.png" alt="lo1see" data-title="lo1see" width="20" height="20" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;lo1see</span></span></div><div class="post-meta-line"><span title="发布于 2024-12-12 16:29:37"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="121229-1212-1212">121229-1212-1212</time></span>&nbsp;<span title="2630 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 2700 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 6 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#peloader-1">PELoader？</a></li>
+    <li><a href="#ide选择">IDE选择</a></li>
+    <li><a href="#main函数">main()函数</a>
+      <ul>
+        <li><a href="#1文件路径">1.文件路径</a></li>
+        <li><a href="#2寻找文件">2.寻找文件</a></li>
+        <li><a href="#3分配磁盘">3.分配&quot;磁盘&quot;</a></li>
+        <li><a href="#4复制">4.复制</a></li>
+      </ul>
+    </li>
+    <li><a href="#check一下pe">Check一下PE</a></li>
+    <li><a href="#loadpe">LoadPE</a>
+      <ul>
+        <li><a href="#1定位">1.定位</a></li>
+        <li><a href="#2分配内存">2.分配&quot;内存&quot;</a></li>
+        <li><a href="#3加载节区">3.加载节区</a></li>
+        <li><a href="#4加载重定位表">4.加载重定位表</a></li>
+        <li><a href="#5加载导入表">5.加载导入表</a></li>
+      </ul>
+    </li>
+    <li><a href="#进入main函数">进入main()函数</a></li>
+    <li><a href="#congratulation">Congratulation！</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="peloader" class="heading-element"><span>PELoader</span>
+  <a href="#peloader" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="peloader-1" class="heading-element"><span>PELoader？</span>
+  <a href="#peloader-1" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>首先要清楚PELoader是干什么的。</p>
+<p>PELoader就相当于一个PE文件加载器，通过运行PELoader可以打开一个PE程序，该PE程序并不是系统为你打开的。运行起来的效果一般和双击是一样的。个人认为也是可以通过PEloader修改文件在内存中的数据的。</p>
+<p>通过写PEloader可以让我们更清楚的了解PE文件的结构，以及运行原理，这对于理解计算机底层是十分有帮助的。</p>
+<h2 id="ide选择" class="heading-element"><span>IDE选择</span>
+  <a href="#ide%e9%80%89%e6%8b%a9" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>推荐使用Visual Studio</p>
+<p>师傅在辅导我写PEloader时，指导我使用了Visual Studio 2022。VS的调试功能十分强大，可以在逐步调试时查看内存，将C代码反汇编等等。在代码不能顺利运行时可以更好的进行调试。</p>
+<p>VS的安全检查比较严格，自己的代码运行时需要关闭安全检查。还有完成后要注意自己要运行的程序是32位还是64位的程序，以及VS本身是x86运行还是x64运行。</p>
+<h2 id="main函数" class="heading-element"><span>main()函数</span>
+  <a href="#main%e5%87%bd%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>因为代码量不小，所以我选择了分为main函数和头文件，再调用头文件中的函数。</p>
+<p>在main函数中</p>
+<h3 id="1文件路径" class="heading-element"><span>1.文件路径</span>
+  <a href="#1%e6%96%87%e4%bb%b6%e8%b7%af%e5%be%84" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>我们需要获得文件的地址，也就是文件路径字符串。</p>
+<h3 id="2寻找文件" class="heading-element"><span>2.寻找文件</span>
+  <a href="#2%e5%af%bb%e6%89%be%e6%96%87%e4%bb%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>根据文件路径，通过<code>fopen()</code>函数找到文件，并给予权限。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if ((fp = fopen(file, &#34;rb&#34;)) == NULL)
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">	printf(&#34;Open file fail&#34;);
+</span></span><span class="line"><span class="cl">	exit(1);
+</span></span><span class="line"><span class="cl">}</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3分配磁盘" class="heading-element"><span>3.分配&quot;磁盘&quot;</span>
+  <a href="#3%e5%88%86%e9%85%8d%e7%a3%81%e7%9b%98" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>计算出文件大小，并分配出一块等大小的内存区域(我声明为<code>pBuf</code>)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">fseek(fp, 0, SEEK_END);
+</span></span><span class="line"><span class="cl">last = ftell(fp);
+</span></span><span class="line"><span class="cl">fsize = last;</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4复制" class="heading-element"><span>4.复制</span>
+  <a href="#4%e5%a4%8d%e5%88%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>将文件的二进制信息全部复制到这块内存区域中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">fseek(fp, 0, SEEK_SET);
+</span></span><span class="line"><span class="cl">pBuf = (PBYTE)malloc(fsize);
+</span></span><span class="line"><span class="cl">fread(pBuf, fsize, 1, fp);</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="check一下pe" class="heading-element"><span>Check一下PE</span>
+  <a href="#check%e4%b8%80%e4%b8%8bpe" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>在将文件读入<code>malloc()</code>给予的内存空间中后，我们拥有了对文件进行操作的权限。在此我将<code>pBuf</code>视为在磁盘中，稍后再将“磁盘”中的文件信息传入内存。</p>
+<p>对<code>pBuf</code>进行一个检查，check以下该文件是不是PE文件，若不是，则退出程序。</p>
+<p>判断PE文件方法即为判断DOS头中的<code>e_magic</code>和NT头中的<code>Signature</code>签名。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if (pDOSheader-&gt;e_magic == IMAGE_DOS_SIGNATURE) {
+</span></span><span class="line"><span class="cl">	if (pNTheader-&gt;Signature == IMAGE_NT_SIGNATURE) {
+</span></span><span class="line"><span class="cl">		return true;
+</span></span><span class="line"><span class="cl">		}
+</span></span><span class="line"><span class="cl">	}</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="loadpe" class="heading-element"><span>LoadPE</span>
+  <a href="#loadpe" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>这里开始进行最主要的加载过程</p>
+<h3 id="1定位" class="heading-element"><span>1.定位</span>
+  <a href="#1%e5%ae%9a%e4%bd%8d" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>利用传入的参数<code>pBuf</code>，得到DOS头，NT头，节区头并赋值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PIMAGE_DOS_HEADER pDOSheader = (PIMAGE_DOS_HEADER)pBuf;//赋值DOS头
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PIMAGE_NT_HEADERS32 pNTheader = (PIMAGE_NT_HEADERS32)(pBuf + pDOSheader-&gt;e_lfanew);//赋值NT头
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PIMAGE_SECTION_HEADER pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)(pNTheader)+ 0x18 + (pNTheader-&gt;FileHeader.SizeOfOptionalHeader));//赋值节区头</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2分配内存" class="heading-element"><span>2.分配&quot;内存&quot;</span>
+  <a href="#2%e5%88%86%e9%85%8d%e5%86%85%e5%ad%98" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>通过<code>VirtualAlloc()</code>函数分配出一片和PE文件同样大的内存区域~，这个大小在可选头的<code>SizeOfImage</code>有保存。我们将这片区域<code>pAlloc</code>视为“内存”中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PBYTE pAlloc = (PBYTE)VirtualAlloc(NULL, pNTheader-&gt;OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后对这片区域利用<code>memset()</code>进行初始化。之后就可将在“磁盘”中的<code>pBuf</code>的文件头加载到“内存”区域的pAlloc。<code>pAlloc</code>的地址就是程序运行时的加载地址。</p>
+<h3 id="3加载节区" class="heading-element"><span>3.加载节区</span>
+  <a href="#3%e5%8a%a0%e8%bd%bd%e8%8a%82%e5%8c%ba" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>通过一二步之后，准备工作就完成了。接下来要开始循环加载节区信息。</p>
+<p>通过学习PE文件的知识，我们知道了磁盘文件或内存的节区大小必定为<code>FileAlignment</code>或<code>SectionAlignment</code>值的整数倍，若不为整数倍，计算机会自动补00对齐。</p>
+<p>通过010 editor观察文件易发现节区头的<code>VirtualAddress</code>和<code>PointToRawData</code>是已经对齐好的，我们不需要写偏移函数来手动对齐。所以只需要</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">memmove(pAlloc + pSecheader-&gt;VirtualAddress, pBuf + pSecheader-&gt;PointerToRawData, pSecheader-&gt;Misc.VirtualSize);</span></span></code></pre></td></tr></table>
+</div>
+</div><p>就可将节区加载进内存。但后面要补的0该怎么办呢？其实早在初始化<code>pAlloc</code>时就已经将不加载数据的区域补了0，并不需要担心。</p>
+<p>加载完一个节区之后不要忘记进入下一个节区继续加载</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pSecheader = (PIMAGE_SECTION_HEADER)((PBYTE)pSecheader + (BYTE)(sizeof(IMAGE_SECTION_HEADER)));</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4加载重定位表" class="heading-element"><span>4.加载重定位表</span>
+  <a href="#4%e5%8a%a0%e8%bd%bd%e9%87%8d%e5%ae%9a%e4%bd%8d%e8%a1%a8" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>加载完节区之后，我们还有重定位表和导入表没有处理。先处理重定位表。</p>
+<p>值得注意的是有的PE文件并<strong>不存在重定位表</strong>，若重定位表地址为00000000，则我们应直接跳过重定位表的处理；有的PE文件<strong>重定位表也不止一个</strong>，不过可选头中给的重定位表的大小是所有重定位表的总和，利用这个大小即可知道是否处理完了重定位表。</p>
+<p>先定位找到重定位表，并确定重定位表的大小</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PIMAGE_BASE_RELOCATION pBaseReloc = (PIMAGE_BASE_RELOCATION)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress + pAlloc);
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">int SizeOfBaseReloc = pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size;</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样就算有多个重定位表，我们也能找到各个重定位表的地址和大小了。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pBaseReloc-&gt;VirtualAddress;
+</span></span><span class="line"><span class="cl">pBaseReloc-&gt;SizeOfBlock;</span></span></code></pre></td></tr></table>
+</div>
+</div><p>通过这两个数据即可得到块的数量和每个块的数据。</p>
+<p>通过对重定位表的学习，我们已清楚重定位原理。先利用位操作得到每个块的前四位，判断每个块的类型，一般为3；并同时得到后12位的偏移地址</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">WORD type = TypeOffset[i] &gt;&gt; 12;
+</span></span><span class="line"><span class="cl">WORD offset = TypeOffset[i] &amp; 0x0FFF;</span></span></code></pre></td></tr></table>
+</div>
+</div><p>偏移地址加上<code>VirtualAddress</code>可得出一个地址，该地址存储着程序的硬编码地址，应读取该值之后减去<code>ImageBase</code>值，再加上实际加载地址pAlloc，得到实际重定位后的硬编码地址。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">*((DWORD*)(offset + (pBaseReloc-&gt;VirtualAddress) + pAlloc)) - pNTheader-&gt;OptionalHeader.ImageBase + (DWORD)pAlloc;</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们将这个值覆盖存储到原先的硬编码地址，重定位就完成了。</p>
+<p><em>若还有多个重定位表，记得在加载完成后给<code>pBaseReloc</code>加上一个<code>SizeOfBlock</code></em></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pBaseReloc = (PIMAGE_BASE_RELOCATION)((PBYTE)pBaseReloc + pBaseReloc-&gt;SizeOfBlock);</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接着回去加载下一个重定位表</p>
+<h3 id="5加载导入表" class="heading-element"><span>5.加载导入表</span>
+  <a href="#5%e5%8a%a0%e8%bd%bd%e5%af%bc%e5%85%a5%e8%a1%a8" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>重定位表处理完成后，就该处理导入表了。</p>
+<p>导入表拥有多个dll文件，dll文件中也有很多函数，要循环加载。</p>
+<p>先声明得到导入表的位置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PIMAGE_IMPORT_DESCRIPTOR pImport = (PIMAGE_IMPORT_DESCRIPTOR)(pNTheader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress + pAlloc);</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>pImport-&gt;Name</code>就是dll文件的文件名字符串的地址，再加上加载地址<code>pAlloc</code>找到字符串，利用win32的LoadLibrary()函数加载dll文件进入内存。</p>
+<p>加载完dll之后就可以计算IAT和INT的地址，开始加载dll中的函数了。</p>
+<p><strong>IAT和INT下都有一个联合体(union)，为u1</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">typedef struct _IMAGE_THUNK_DATA32 {
+</span></span><span class="line"><span class="cl">    union {
+</span></span><span class="line"><span class="cl">        DWORD ForwarderString;      // PBYTE 
+</span></span><span class="line"><span class="cl">        DWORD Function;             // PDWORD
+</span></span><span class="line"><span class="cl">        DWORD Ordinal;
+</span></span><span class="line"><span class="cl">        DWORD AddressOfData;        // PIMAGE_IMPORT_BY_NAME
+</span></span><span class="line"><span class="cl">    } u1;
+</span></span><span class="line"><span class="cl">} IMAGE_THUNK_DATA32;
+</span></span><span class="line"><span class="cl">typedef IMAGE_THUNK_DATA32 * PIMAGE_THUNK_DATA32;</span></span></code></pre></td></tr></table>
+</div>
+</div><p>拥有四个元素，这四个元素公用了同一个<code>DWORD</code>，即为同一个值。但该值可拥有多种作用，便有了多种写法。</p>
+<p>在导入函数时，先判断一下函数是使用哪种方法导入的。</p>
+<p>若是用序号导入函数，则INT中存储的地址最高位即为1。故进行判断</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if (pINT-&gt;u1.AddressOfData &amp; IMAGE_ORDINAL_FLAG32)</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若为真，则函数使用序号导入，而不使用字符串来查找函数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, (LPCSTR)(pINT-&gt;u1.Ordinal)));</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若为假，就可能需要使用字符串查找函数地址</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pIAT-&gt;u1.AddressOfData = (DWORD)(GetProcAddress(hProcess, pFucname-&gt;Name));</span></span></code></pre></td></tr></table>
+</div>
+</div><p>函数导入完毕，别忘了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pINT++;
+</span></span><span class="line"><span class="cl">pIAT++;</span></span></code></pre></td></tr></table>
+</div>
+</div><p>导入完一个dll之后也要</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pImport++;</span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>这里的+1是加了<code>IMAGE_IMPORT_DESCRIPTOR</code>一个结构体的大小，而不是一个字节，所以可以跳到下一个dll的导入表。</em></p>
+<h2 id="进入main函数" class="heading-element"><span>进入main()函数</span>
+  <a href="#%e8%bf%9b%e5%85%a5main%e5%87%bd%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>至此，已load完成。接下来就是利用函数指针，指向<code>EntryPoint</code>，即可调用主函数，运行程序。</p>
+<h2 id="congratulation" class="heading-element"><span>Congratulation！</span>
+  <a href="#congratulation" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>顺利的话程序这样就已经运行起来了，恭喜。</p>
+<p>源码：</p>
+<p><a href="https://github.com/lo1see/PELoader"target="_blank" rel="external nofollow noopener noreferrer">https://github.com/lo1see/PELoader</a></p>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-12 16:29:37">更新于 121229-1212-1212&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/" data-title="PE文件加载器"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/" data-title="PE文件加载器"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/%E5%93%88%E5%96%BD%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2/" class="post-nav-item" rel="prev" title="哈喽，我的博客"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>哈喽，我的博客</a><a href="/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/" class="post-nav-item" rel="next" title="Requests库学习">Requests库学习<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

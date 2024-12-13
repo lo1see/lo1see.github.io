@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>TLS回调函数 - lo1see</title><meta name="author" content="lo1see">
+<meta name="description" content="TLS介绍 定义 引用官方的释义：Thread Local Storage (TLS)
+">
+  <meta itemprop="name" content="TLS回调函数">
+  <meta itemprop="description" content="TLS介绍 定义 引用官方的释义：Thread Local Storage (TLS)">
+  <meta itemprop="datePublished" content="2024-12-12T16:36:25+08:00">
+  <meta itemprop="dateModified" content="2024-12-12T16:36:25+08:00">
+  <meta itemprop="wordCount" content="1699"><meta property="og:url" content="http://localhost:1313/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="TLS回调函数">
+  <meta property="og:description" content="TLS介绍 定义 引用官方的释义：Thread Local Storage (TLS)">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-12T16:36:25+08:00">
+    <meta property="article:modified_time" content="2024-12-12T16:36:25+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="TLS回调函数">
+  <meta name="twitter:description" content="TLS介绍 定义 引用官方的释义：Thread Local Storage (TLS)">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" title="TLS回调函数 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/" title="Requests库学习" /><link rel="next" type="text/html" href="http://localhost:1313/posts/win32%E5%87%BD%E6%95%B0%E8%8D%89%E8%AE%B0/" title="Win32函数草记" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/index.md" title="TLS回调函数 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "TLS回调函数",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0\/"
+    },"genre": "posts","wordcount":  1699 ,
+    "url": "http:\/\/localhost:1313\/posts\/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0\/","datePublished": "2024-12-12T16:36:25+08:00","dateModified": "2024-12-12T16:36:25+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "lo1see"
+      },"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>TLS回调函数</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/avater.png" alt="lo1see" data-title="lo1see" width="20" height="20" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;lo1see</span></span></div><div class="post-meta-line"><span title="发布于 2024-12-12 16:36:25"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="121236-1212-1212">121236-1212-1212</time></span>&nbsp;<span title="1699 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 1700 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 4 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#定义">定义</a></li>
+    <li><a href="#作用">作用</a></li>
+    <li><a href="#运行">运行</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#声明tls回调函数">声明TLS回调函数</a></li>
+    <li><a href="#回调函数定义">回调函数定义：</a></li>
+    <li><a href="#注册tls回调函数">注册TLS回调函数</a></li>
+    <li><a href="#tls回调函数实例">TLS回调函数实例：</a></li>
+    <li><a href="#注">注：</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="tls介绍" class="heading-element"><span>TLS介绍</span>
+  <a href="#tls%e4%bb%8b%e7%bb%8d" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="定义" class="heading-element"><span>定义</span>
+  <a href="#%e5%ae%9a%e4%b9%89" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>引用官方的释义：<a href="https://learn.microsoft.com/en-us/cpp/parallel/thread-local-storage-tls?view=msvc-160"target="_blank" rel="external nofollow noopener noreferrer">Thread Local Storage (TLS)</a></p>
+<p>线程本地存储 (TLS) 是给定多线程进程中的每个线程分配存储线程特定数据的位置的方法。通过 TLS API ( <a href="https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-tlsalloc"target="_blank" rel="external nofollow noopener noreferrer">TlsAlloc</a> ) 支持动态绑定（运行时）线程特定数据。除了现有的 API 实现之外，Win32 和 Microsoft C++ 编译器现在还支持静态绑定（加载时）每线程数据。</p>
+<h2 id="作用" class="heading-element"><span>作用</span>
+  <a href="#%e4%bd%9c%e7%94%a8" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>在TLS中定义的变量，同一个线程里的所有函数均可访问，但其他线程无法访问</p>
+<h2 id="运行" class="heading-element"><span>运行</span>
+  <a href="#%e8%bf%90%e8%a1%8c" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>每当创建/终止线程时会自动调用执行的函数（<strong>创建进程的主线程时也会自动调用回调函数，且回调函数的执行顺序是先于EP代码的执行，所以TLS回调函数的这个特性通常被用于反调试技术</strong>）由于是创建和终止线程时都会调用，所以在程序从打开到结束这个TLS回调函数会被执行两次。</p>
+<h2 id="文件结构" class="heading-element"><span>文件结构</span>
+  <a href="#%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>在NT头的 IMAGE_DATA_DIRECTORY 数组中可以查到 IMAGE_DATA_DIRECTORY  TLSDirectory，知晓TLS结构体所在的RVA和RAW以及大小。</p>
+<p><img loading="lazy" src="https://s1.ax1x.com/2023/04/02/ppfGs41.png" alt="https://s1.ax1x.com/2023/04/02/ppfGs41.png" srcset="https://s1.ax1x.com/2023/04/02/ppfGs41.png?size=small, https://s1.ax1x.com/2023/04/02/ppfGs41.png?size=medium 1.5x, https://s1.ax1x.com/2023/04/02/ppfGs41.png?size=large 2x" data-title="https://s1.ax1x.com/2023/04/02/ppfGs41.png" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>TLS根据编译时也分为了x86和x64两种结构体</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_IMAGE_TLS_DIRECTORY32</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span>   <span class="n">StartAddressOfRawData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span>   <span class="n">EndAddressOfRawData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span>   <span class="n">AddressOfIndex</span><span class="p">;</span>             <span class="c1">// PDWORD
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DWORD</span>   <span class="n">AddressOfCallBacks</span><span class="p">;</span>         <span class="c1">// PIMAGE_TLS_CALLBACK *
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DWORD</span>   <span class="n">SizeOfZeroFill</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">union</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">DWORD</span> <span class="n">Characteristics</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">DWORD</span> <span class="nl">Reserved0</span> <span class="p">:</span> <span class="mi">20</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">DWORD</span> <span class="nl">Alignment</span> <span class="p">:</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">DWORD</span> <span class="nl">Reserved1</span> <span class="p">:</span> <span class="mi">8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="n">DUMMYSTRUCTNAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="n">DUMMYUNIONNAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">IMAGE_TLS_DIRECTORY32</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="n">IMAGE_TLS_DIRECTORY32</span> <span class="o">*</span> <span class="n">PIMAGE_TLS_DIRECTORY32</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_IMAGE_TLS_DIRECTORY64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONGLONG</span> <span class="n">StartAddressOfRawData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONGLONG</span> <span class="n">EndAddressOfRawData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONGLONG</span> <span class="n">AddressOfIndex</span><span class="p">;</span>         <span class="c1">// PDWORD
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">ULONGLONG</span> <span class="n">AddressOfCallBacks</span><span class="p">;</span>     <span class="c1">// PIMAGE_TLS_CALLBACK *;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DWORD</span> <span class="n">SizeOfZeroFill</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">union</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">DWORD</span> <span class="n">Characteristics</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">DWORD</span> <span class="nl">Reserved0</span> <span class="p">:</span> <span class="mi">20</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">DWORD</span> <span class="nl">Alignment</span> <span class="p">:</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">DWORD</span> <span class="nl">Reserved1</span> <span class="p">:</span> <span class="mi">8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="n">DUMMYSTRUCTNAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="n">DUMMYUNIONNAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">IMAGE_TLS_DIRECTORY64</span><span class="p">;</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>结构体中各个参数的意义大致如下：</p>
+<ul>
+<li>
+<p>StartAddressOfRawData：TLS模板的起始位置的VA，这个所谓的模板其实就是用于初始化TLS函数的数据</p>
+</li>
+<li>
+<p>EndAddressOfRawData：TLS模板终止位置的VA</p>
+</li>
+<li>
+<p>AddressOfIndex：存储TLS索引的位置</p>
+<p>（以上3个参数指向的地址可以存储为00000000即NULL区域）</p>
+</li>
+<li>
+<p><strong>AddressOfCallBacks：指向TLS注册的回调函数的函数指针(地址)数组</strong></p>
+</li>
+<li>
+<p>SizeOfZeroFill：用于指定非零初始化数据后面的空白空间的大小</p>
+</li>
+<li>
+<p>Characteristics：属性</p>
+</li>
+</ul>
+<h2 id="调试技巧" class="heading-element"><span>调试技巧</span>
+  <a href="#%e8%b0%83%e8%af%95%e6%8a%80%e5%b7%a7" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>因为TLS函数会在main()函数之前执行，所以要设置系统断点或TLS回调函数断点，这样调试器就可以在TLS函数执行之前断下。</p>
+<p>也可以用PEview或010 editor等程序找到TLS结构体的AddressOfCallBacks成员所储存的地址，直接跳到那里设下断点，再Ctrl + F2重新调试就可以运行到断点处。</p>
+<h2 id="程序编写" class="heading-element"><span>程序编写</span>
+  <a href="#%e7%a8%8b%e5%ba%8f%e7%bc%96%e5%86%99" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="声明tls回调函数" class="heading-element"><span>声明TLS回调函数</span>
+  <a href="#%e5%a3%b0%e6%98%8etls%e5%9b%9e%e8%b0%83%e5%87%bd%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>告诉编译器要使用TLS回调函数，即声明TLS回调函数。以下代码用了条件语句判定要编写x64还是x86的程序：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64       </span><span class="c1">//64位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>     <span class="cp">#pragma comment (linker, &#34;/INCLUDE:_tls_used&#34;)  
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>     <span class="cp">#pragma comment (linker, &#34;/INCLUDE:tls_callback_func&#34;) 
+</span></span></span><span class="line"><span class="cl"><span class="cp">#else               </span><span class="c1">//32位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>     <span class="cp">#pragma comment (linker, &#34;/INCLUDE:__tls_used&#34;) 
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>     <span class="cp">#pragma comment (linker, &#34;/INCLUDE:_tls_callback_func&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#endif</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="回调函数定义" class="heading-element"><span>回调函数定义：</span>
+  <a href="#%e5%9b%9e%e8%b0%83%e5%87%bd%e6%95%b0%e5%ae%9a%e4%b9%89" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="nf">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">NTAPI</span> <span class="o">*</span><span class="n">PIMAGE_TLS_CALLBACK</span><span class="p">)</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">DllHandle</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">Reason</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">Reserved</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>参数1： <code>PVOID DllHandle</code> ：指向DLL实例句柄</p>
+<p>参数2：<code>DWORD Reason</code> ：调用TLS回调函数的原因：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="cp">#define DLL_PROCESS_ATTACH   1
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define DLL_THREAD_ATTACH    2
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define DLL_THREAD_DETACH    3
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define DLL_PROCESS_DETACH   0</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>参数3： <code>PVOID Reserved</code> ：保留，固定为0</p>
+<h2 id="注册tls回调函数" class="heading-element"><span>注册TLS回调函数</span>
+  <a href="#%e6%b3%a8%e5%86%8ctls%e5%9b%9e%e8%b0%83%e5%87%bd%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64                           </span><span class="c1">//64位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="cp">#pragma const_seg(&#34;.CRT$XLF&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>    <span class="n">EXTERN_C</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>    <span class="cp">#pragma data_seg(&#34;.CRT$XLF&#34;)        </span><span class="c1">//32位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">EXTERN_C</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="n">PIMAGE_TLS_CALLBACK</span> <span class="n">tls_callback_func</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">tls_callback</span><span class="p">,</span><span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64                           </span><span class="c1">//64位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="cp">#pragma const_seg()
+</span></span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>    <span class="cp">#pragma data_seg()                  </span><span class="c1">//32位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#endif </span><span class="c1">//_WIN64
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>&quot;.CRT$XLF&quot;</code>的含义：</p>
+<p>CRT表示使用C Runtime 机制</p>
+<p>X表示 标识名随机</p>
+<p>L表示 TLS Callback section</p>
+<p>F也可以替换成B~Y的任意一个字符</p>
+<h2 id="tls回调函数实例" class="heading-element"><span>TLS回调函数实例：</span>
+  <a href="#tls%e5%9b%9e%e8%b0%83%e5%87%bd%e6%95%b0%e5%ae%9e%e4%be%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;Windows.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64       </span><span class="c1">//64位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#pragma comment (linker, &#34;/INCLUDE:_tls_used&#34;)  
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment (linker, &#34;/INCLUDE:tls_callback_func&#34;) 
+</span></span></span><span class="line"><span class="cl"><span class="cp">#else               </span><span class="c1">//32位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#pragma comment (linker, &#34;/INCLUDE:__tls_used&#34;) 
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment (linker, &#34;/INCLUDE:_tls_callback_func&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">print_console</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">szMsg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HANDLE</span> <span class="n">hStdout</span> <span class="o">=</span> <span class="nf">GetStdHandle</span><span class="p">(</span><span class="n">STD_OUTPUT_HANDLE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">WriteConsoleA</span><span class="p">(</span><span class="n">hStdout</span><span class="p">,</span> <span class="n">szMsg</span><span class="p">,</span> <span class="nf">strlen</span><span class="p">(</span><span class="n">szMsg</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">NTAPI</span> <span class="nf">TLS_CALLBACK</span><span class="p">(</span><span class="n">PVOID</span> <span class="n">DllHandle</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">Reason</span><span class="p">,</span> <span class="n">PVOID</span> <span class="n">Reserved</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szMsg</span><span class="p">[</span><span class="mi">80</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">,</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="n">Reason</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_PROCESS_ATTACH</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">wsprintfA</span><span class="p">(</span><span class="n">szMsg</span><span class="p">,</span> <span class="s">&#34;DLL_PROCESS_ATTACH </span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">print_console</span><span class="p">(</span><span class="n">szMsg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_THREAD_ATTACH</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">wsprintfA</span><span class="p">(</span><span class="n">szMsg</span><span class="p">,</span> <span class="s">&#34;DLL_THREAD_ATTACH</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">print_console</span><span class="p">(</span><span class="n">szMsg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_THREAD_DETACH</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">wsprintfA</span><span class="p">(</span><span class="n">szMsg</span><span class="p">,</span> <span class="s">&#34;DLL_THREAD_DETACH</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">print_console</span><span class="p">(</span><span class="n">szMsg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nl">DLL_PROCESS_DETACH</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">wsprintfA</span><span class="p">(</span><span class="n">szMsg</span><span class="p">,</span> <span class="s">&#34;DLL_PROCESS_DETACH</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">        <span class="nf">print_console</span><span class="p">(</span><span class="n">szMsg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">wsprintfA</span><span class="p">(</span><span class="n">szMsg</span><span class="p">,</span> <span class="s">&#34;NOTHING</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    	<span class="nf">print_console</span><span class="p">(</span><span class="n">szMsg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64                           </span><span class="c1">//64位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#pragma const_seg(&#34;.CRT$XLF&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="n">EXTERN_C</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma data_seg(&#34;.CRT$XLF&#34;)        </span><span class="c1">//32位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">EXTERN_C</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="n">PIMAGE_TLS_CALLBACK</span> <span class="n">tls_callback_func</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">TLS_CALLBACK</span><span class="p">,</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64                           </span><span class="c1">//64位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#pragma const_seg()
+</span></span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma data_seg()                  </span><span class="c1">//32位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#endif </span><span class="c1">//_WIN64
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Is TLS successful ?</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="注" class="heading-element"><span>注：</span>
+  <a href="#%e6%b3%a8" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>TLS函数中建议不要使用printf()函数，因为开启特定编译选项（/MT）编译源程序时，先于主线程调用执行的TLS回调函数中可能发生Run-Time Error（运行时错误）。此时可以直接调用<code>WriteConsole()</code> API来以防万一</p>
+<h2 id="相关资料" class="heading-element"><span>相关资料</span>
+  <a href="#%e7%9b%b8%e5%85%b3%e8%b5%84%e6%96%99" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><a href="https://xz.aliyun.com/t/12057"target="_blank" rel="external nofollow noopener noreferrer">TLS回调函数的学习</a></p>
+<p><a href="https://www.52pojie.cn/thread-1490663-1-1.html"target="_blank" rel="external nofollow noopener noreferrer"><strong>[调试逆向]</strong> <strong>【原创】反调试实战系列二 TLS反调试+CheckRemoteDebuggerPresent原理</strong></a></p>
+<p>以及相关<a href="learn.microsft.com">MSDN</a>内的资料</p>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-12 16:36:25">更新于 121236-1212-1212&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" data-title="TLS回调函数"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" data-title="TLS回调函数"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/" class="post-nav-item" rel="prev" title="Requests库学习"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>Requests库学习</a><a href="/posts/win32%E5%87%BD%E6%95%B0%E8%8D%89%E8%AE%B0/" class="post-nav-item" rel="next" title="Win32函数草记">Win32函数草记<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>加密与解密系统篇笔记 - lo1see</title><meta name="author" content="lo1see">
+<meta name="description" content="内核函数主要前缀 Ex：管理层。&quot;Ex&ldquo;是&rdquo;Executive&ldquo;的开头两个字母 Ke：核心层。&quot;Ke&ldquo;是&rdquo;Kernel&ldquo;的开头两个字母 Hal：硬件抽象层。&quot;Hal&ldquo;是&rdquo;Hardware Abstraction Layer&ldquo;的缩写 Ob：对象管理。&quot;Ob&ldquo;是&rdquo;Object&ldquo;的开头两个字母 Mm：内存管理。&quot;Mm&ldquo;是&rdquo;Memory Manager&ldquo;的缩写 Ps：进程（线程）管理。&quot;Ps&ldquo;是&rdquo;Process&rdquo; Se：安全管理。&quot;Se&ldquo;是&rdquo;Security&ldquo;的开头两个字母 Io：I/O管理 Fs：文件系统。&quot;Fs&ldquo;是&rdquo;File System&ldquo;的缩写 Cc：文件缓存管理。&quot;Cc&ldquo;表示&rdquo;Cache&rdquo; Cm：系统配置管理。&quot;Cm&ldquo;是&rdquo;Configuration Manager&ldquo;的缩写 Pp：即插即用管理。&quot;Pp&ldquo;表示&rdquo;Pnp&rdquo; Rtl：运行时程序库。&quot;Rtl&ldquo;是&rdquo;Runtime Library&ldquo;的缩写 Zw/Nt：对应于SSDT中的服务函数，例如与文件或者注册表相关的操作函数 Flt：Minifilter文件过滤驱动中调用的函数 Ndis：Ndis网络框架中调用的函数 异常处理 SEH 常见异常产生原因
+">
+  <meta itemprop="name" content="加密与解密系统篇笔记">
+  <meta itemprop="description" content="内核函数主要前缀 Ex：管理层。&#34;Ex“是”Executive“的开头两个字母 Ke：核心层。&#34;Ke“是”Kernel“的开头两个字母 Hal：硬件抽象层。&#34;Hal“是”Hardware Abstraction Layer“的缩写 Ob：对象管理。&#34;Ob“是”Object“的开头两个字母 Mm：内存管理。&#34;Mm“是”Memory Manager“的缩写 Ps：进程（线程）管理。&#34;Ps“是”Process” Se：安全管理。&#34;Se“是”Security“的开头两个字母 Io：I/O管理 Fs：文件系统。&#34;Fs“是”File System“的缩写 Cc：文件缓存管理。&#34;Cc“表示”Cache” Cm：系统配置管理。&#34;Cm“是”Configuration Manager“的缩写 Pp：即插即用管理。&#34;Pp“表示”Pnp” Rtl：运行时程序库。&#34;Rtl“是”Runtime Library“的缩写 Zw/Nt：对应于SSDT中的服务函数，例如与文件或者注册表相关的操作函数 Flt：Minifilter文件过滤驱动中调用的函数 Ndis：Ndis网络框架中调用的函数 异常处理 SEH 常见异常产生原因">
+  <meta itemprop="datePublished" content="2024-12-12T16:44:07+08:00">
+  <meta itemprop="dateModified" content="2024-12-12T16:44:07+08:00">
+  <meta itemprop="wordCount" content="838"><meta property="og:url" content="http://localhost:1313/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="加密与解密系统篇笔记">
+  <meta property="og:description" content="内核函数主要前缀 Ex：管理层。&#34;Ex“是”Executive“的开头两个字母 Ke：核心层。&#34;Ke“是”Kernel“的开头两个字母 Hal：硬件抽象层。&#34;Hal“是”Hardware Abstraction Layer“的缩写 Ob：对象管理。&#34;Ob“是”Object“的开头两个字母 Mm：内存管理。&#34;Mm“是”Memory Manager“的缩写 Ps：进程（线程）管理。&#34;Ps“是”Process” Se：安全管理。&#34;Se“是”Security“的开头两个字母 Io：I/O管理 Fs：文件系统。&#34;Fs“是”File System“的缩写 Cc：文件缓存管理。&#34;Cc“表示”Cache” Cm：系统配置管理。&#34;Cm“是”Configuration Manager“的缩写 Pp：即插即用管理。&#34;Pp“表示”Pnp” Rtl：运行时程序库。&#34;Rtl“是”Runtime Library“的缩写 Zw/Nt：对应于SSDT中的服务函数，例如与文件或者注册表相关的操作函数 Flt：Minifilter文件过滤驱动中调用的函数 Ndis：Ndis网络框架中调用的函数 异常处理 SEH 常见异常产生原因">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-12T16:44:07+08:00">
+    <meta property="article:modified_time" content="2024-12-12T16:44:07+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="加密与解密系统篇笔记">
+  <meta name="twitter:description" content="内核函数主要前缀 Ex：管理层。&#34;Ex“是”Executive“的开头两个字母 Ke：核心层。&#34;Ke“是”Kernel“的开头两个字母 Hal：硬件抽象层。&#34;Hal“是”Hardware Abstraction Layer“的缩写 Ob：对象管理。&#34;Ob“是”Object“的开头两个字母 Mm：内存管理。&#34;Mm“是”Memory Manager“的缩写 Ps：进程（线程）管理。&#34;Ps“是”Process” Se：安全管理。&#34;Se“是”Security“的开头两个字母 Io：I/O管理 Fs：文件系统。&#34;Fs“是”File System“的缩写 Cc：文件缓存管理。&#34;Cc“表示”Cache” Cm：系统配置管理。&#34;Cm“是”Configuration Manager“的缩写 Pp：即插即用管理。&#34;Pp“表示”Pnp” Rtl：运行时程序库。&#34;Rtl“是”Runtime Library“的缩写 Zw/Nt：对应于SSDT中的服务函数，例如与文件或者注册表相关的操作函数 Flt：Minifilter文件过滤驱动中调用的函数 Ndis：Ndis网络框架中调用的函数 异常处理 SEH 常见异常产生原因">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/" title="加密与解密系统篇笔记 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A/" title="调用约定" /><link rel="next" type="text/html" href="http://localhost:1313/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/" title="VMP学习随手简记" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/index.md" title="加密与解密系统篇笔记 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "加密与解密系统篇笔记",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0\/"
+    },"genre": "posts","wordcount":  838 ,
+    "url": "http:\/\/localhost:1313\/posts\/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0\/","datePublished": "2024-12-12T16:44:07+08:00","dateModified": "2024-12-12T16:44:07+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "lo1see"
+      },"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>加密与解密系统篇笔记</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/avater.png" alt="lo1see" data-title="lo1see" width="20" height="20" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;lo1see</span></span></div><div class="post-meta-line"><span title="发布于 2024-12-12 16:44:07"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="121244-1212-1212">121244-1212-1212</time></span>&nbsp;<span title="838 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 900 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 2 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#seh">SEH</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="内核函数主要前缀" class="heading-element"><span>内核函数主要前缀</span>
+  <a href="#%e5%86%85%e6%a0%b8%e5%87%bd%e6%95%b0%e4%b8%bb%e8%a6%81%e5%89%8d%e7%bc%80" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><ul>
+<li><code>Ex</code>：管理层。&quot;<code>Ex</code>&ldquo;是&rdquo;<code>Executive</code>&ldquo;的开头两个字母</li>
+<li><code>Ke</code>：核心层。&quot;<code>Ke</code>&ldquo;是&rdquo;<code>Kernel</code>&ldquo;的开头两个字母</li>
+<li><code>Hal</code>：硬件抽象层。&quot;<code>Hal</code>&ldquo;是&rdquo;<code>Hardware Abstraction Layer</code>&ldquo;的缩写</li>
+<li><code>Ob</code>：对象管理。&quot;<code>Ob</code>&ldquo;是&rdquo;<code>Object</code>&ldquo;的开头两个字母</li>
+<li><code>Mm</code>：内存管理。&quot;<code>Mm</code>&ldquo;是&rdquo;<code>Memory Manager</code>&ldquo;的缩写</li>
+<li><code>Ps</code>：进程（线程）管理。&quot;<code>Ps</code>&ldquo;是&rdquo;<code>Process</code>&rdquo;</li>
+<li><code>Se</code>：安全管理。&quot;<code>Se</code>&ldquo;是&rdquo;<code>Security</code>&ldquo;的开头两个字母</li>
+<li><code>Io</code>：<code>I/O</code>管理</li>
+<li><code>Fs</code>：文件系统。&quot;<code>Fs</code>&ldquo;是&rdquo;<code>File System</code>&ldquo;的缩写</li>
+<li><code>Cc</code>：文件缓存管理。&quot;<code>Cc</code>&ldquo;表示&rdquo;<code>Cache</code>&rdquo;</li>
+<li><code>Cm</code>：系统配置管理。&quot;<code>Cm</code>&ldquo;是&rdquo;<code>Configuration Manager</code>&ldquo;的缩写</li>
+<li><code>Pp</code>：即插即用管理。&quot;<code>Pp</code>&ldquo;表示&rdquo;<code>Pnp</code>&rdquo;</li>
+<li><code>Rtl</code>：运行时程序库。&quot;<code>Rtl</code>&ldquo;是&rdquo;<code>Runtime Library</code>&ldquo;的缩写</li>
+<li><code>Zw/Nt</code>：对应于<code>SSDT</code>中的服务函数，例如与文件或者注册表相关的操作函数</li>
+<li><code>Flt</code>：<code>Minifilter</code>文件过滤驱动中调用的函数</li>
+<li><code>Ndis</code>：<code>Ndis</code>网络框架中调用的函数</li>
+</ul>
+<h2 id="异常处理" class="heading-element"><span>异常处理</span>
+  <a href="#%e5%bc%82%e5%b8%b8%e5%a4%84%e7%90%86" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="seh" class="heading-element"><span>SEH</span>
+  <a href="#seh" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>常见异常产生原因</p>
+<table>
+  <thead>
+      <tr>
+          <th>异常产生原因</th>
+          <th>对应值</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>STATUS_GUARD_PAGE_VIOLATION</td>
+          <td>080000001h</td>
+          <td>读写属性为PAGE_GUARD的页面</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_VREAKPOINT</td>
+          <td>080000003h</td>
+          <td>断点异常</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_SINGLE_STEP</td>
+          <td>080000004h</td>
+          <td>单步中断</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_INVALID_HANDLE</td>
+          <td>0C0000008h</td>
+          <td>向一个函数传递了一个无效句柄</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_ACCESS_VIOLATION</td>
+          <td>0C0000005h</td>
+          <td>读写内存冲突</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_ILLEGAL_INSTRUCTION</td>
+          <td>0C000001Dh</td>
+          <td>遇到无效指令</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_INPAGE_ERROR</td>
+          <td>0C0000006h</td>
+          <td>存取不存在的页面</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_INT_DIVIDE_BY_ZERO</td>
+          <td>0C0000094h</td>
+          <td>除零错误</td>
+      </tr>
+      <tr>
+          <td>EXCEPTION_STACK_OVERFLOW</td>
+          <td>0C00000FDh</td>
+          <td>栈溢出</td>
+      </tr>
+  </tbody>
+</table>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-12 16:44:07">更新于 121244-1212-1212&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/" data-title="加密与解密系统篇笔记"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86%E7%B3%BB%E7%BB%9F%E7%AF%87%E7%AC%94%E8%AE%B0/" data-title="加密与解密系统篇笔记"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A/" class="post-nav-item" rel="prev" title="调用约定"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>调用约定</a><a href="/posts/vmp%E5%AD%A6%E4%B9%A0%E9%9A%8F%E6%89%8B%E7%AE%80%E8%AE%B0/" class="post-nav-item" rel="next" title="VMP学习随手简记">VMP学习随手简记<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

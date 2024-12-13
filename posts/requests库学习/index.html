@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>Requests库学习 - lo1see</title><meta name="author" content="lo1see">
+<meta name="description" content="requests库使用 requests方法 方法 描述 requests.get(url, params, **args) 发送 GET 请求到指定 url requests.post(url, data, json, **args) 发送 POST 请求到指定 url requests.head(url, **args) 发送 HEAD 请求到指定 url requests.patch(url, data, **args) 发送 PATCH 请求到指定 url requests.delete(url, **args) 发送 DELETE 请求到指定 url requests.put(url, data, **args) 发送 PUT 请求到指定 url requests.request(method, url, **args) 向指定的 url 发送指定的请求方法 requests响应信息 属性或方法 说明 url 返回响应的 URL text 返回响应的内容，unicode 类型数据 status_code 返回 http 的状态码，比如 404 和 200（200 是 OK，404 是 Not Found） raise_for_status() 如果发生错误，方法返回一个 HTTPError 对象 encoding 解码 r.text 的编码方式 apparent_encoding 编码方式 content 返回响应的内容，以字节为单位 headers 返回响应头，字典格式 close() 关闭与服务器的连接 cookies 返回一个 CookieJar 对象，包含了从服务器发回的 cookie history 返回包含请求历史的响应对象列表（url） json() 返回结果的 JSON 对象 (结果需要以 JSON 格式编写的，否则会引发错误) next 返回重定向链中下一个请求的 PreparedRequest 对象 ok 检查 &quot;status_code&quot; 的值，如果小于400，则返回 True，如果不小于 400，则返回 False reason 响应状态的描述，比如 &quot;Not Found&quot; 或 &quot;OK&quot; request 返回请求此响应的请求对象 links 返回响应的解析头链接 is_permanent_redirect 如果响应是永久重定向的 url，则返回 True，否则返回 False is_redirect 如果响应被重定向，则返回 True，否则返回 False iter_content() 迭代响应 iter_lines() 迭代响应的行 elapsed 返回一个 timedelta 对象，包含了从发送请求到响应到达之间经过的时间量，可以用于测试响应速度。比如 r.elapsed.microseconds 表示响应到达需要多少微秒。 get和post区别 requests.get(url, params, **args)通过params(字符串)进行传参
+">
+  <meta itemprop="name" content="Requests库学习">
+  <meta itemprop="description" content="requests库使用 requests方法 方法 描述 requests.get(url, params, **args) 发送 GET 请求到指定 url requests.post(url, data, json, **args) 发送 POST 请求到指定 url requests.head(url, **args) 发送 HEAD 请求到指定 url requests.patch(url, data, **args) 发送 PATCH 请求到指定 url requests.delete(url, **args) 发送 DELETE 请求到指定 url requests.put(url, data, **args) 发送 PUT 请求到指定 url requests.request(method, url, **args) 向指定的 url 发送指定的请求方法 requests响应信息 属性或方法 说明 url 返回响应的 URL text 返回响应的内容，unicode 类型数据 status_code 返回 http 的状态码，比如 404 和 200（200 是 OK，404 是 Not Found） raise_for_status() 如果发生错误，方法返回一个 HTTPError 对象 encoding 解码 r.text 的编码方式 apparent_encoding 编码方式 content 返回响应的内容，以字节为单位 headers 返回响应头，字典格式 close() 关闭与服务器的连接 cookies 返回一个 CookieJar 对象，包含了从服务器发回的 cookie history 返回包含请求历史的响应对象列表（url） json() 返回结果的 JSON 对象 (结果需要以 JSON 格式编写的，否则会引发错误) next 返回重定向链中下一个请求的 PreparedRequest 对象 ok 检查 &#34;status_code&#34; 的值，如果小于400，则返回 True，如果不小于 400，则返回 False reason 响应状态的描述，比如 &#34;Not Found&#34; 或 &#34;OK&#34; request 返回请求此响应的请求对象 links 返回响应的解析头链接 is_permanent_redirect 如果响应是永久重定向的 url，则返回 True，否则返回 False is_redirect 如果响应被重定向，则返回 True，否则返回 False iter_content() 迭代响应 iter_lines() 迭代响应的行 elapsed 返回一个 timedelta 对象，包含了从发送请求到响应到达之间经过的时间量，可以用于测试响应速度。比如 r.elapsed.microseconds 表示响应到达需要多少微秒。 get和post区别 requests.get(url, params, **args)通过params(字符串)进行传参">
+  <meta itemprop="datePublished" content="2024-12-12T16:35:53+08:00">
+  <meta itemprop="dateModified" content="2024-12-12T16:35:53+08:00">
+  <meta itemprop="wordCount" content="737"><meta property="og:url" content="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="Requests库学习">
+  <meta property="og:description" content="requests库使用 requests方法 方法 描述 requests.get(url, params, **args) 发送 GET 请求到指定 url requests.post(url, data, json, **args) 发送 POST 请求到指定 url requests.head(url, **args) 发送 HEAD 请求到指定 url requests.patch(url, data, **args) 发送 PATCH 请求到指定 url requests.delete(url, **args) 发送 DELETE 请求到指定 url requests.put(url, data, **args) 发送 PUT 请求到指定 url requests.request(method, url, **args) 向指定的 url 发送指定的请求方法 requests响应信息 属性或方法 说明 url 返回响应的 URL text 返回响应的内容，unicode 类型数据 status_code 返回 http 的状态码，比如 404 和 200（200 是 OK，404 是 Not Found） raise_for_status() 如果发生错误，方法返回一个 HTTPError 对象 encoding 解码 r.text 的编码方式 apparent_encoding 编码方式 content 返回响应的内容，以字节为单位 headers 返回响应头，字典格式 close() 关闭与服务器的连接 cookies 返回一个 CookieJar 对象，包含了从服务器发回的 cookie history 返回包含请求历史的响应对象列表（url） json() 返回结果的 JSON 对象 (结果需要以 JSON 格式编写的，否则会引发错误) next 返回重定向链中下一个请求的 PreparedRequest 对象 ok 检查 &#34;status_code&#34; 的值，如果小于400，则返回 True，如果不小于 400，则返回 False reason 响应状态的描述，比如 &#34;Not Found&#34; 或 &#34;OK&#34; request 返回请求此响应的请求对象 links 返回响应的解析头链接 is_permanent_redirect 如果响应是永久重定向的 url，则返回 True，否则返回 False is_redirect 如果响应被重定向，则返回 True，否则返回 False iter_content() 迭代响应 iter_lines() 迭代响应的行 elapsed 返回一个 timedelta 对象，包含了从发送请求到响应到达之间经过的时间量，可以用于测试响应速度。比如 r.elapsed.microseconds 表示响应到达需要多少微秒。 get和post区别 requests.get(url, params, **args)通过params(字符串)进行传参">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-12T16:35:53+08:00">
+    <meta property="article:modified_time" content="2024-12-12T16:35:53+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Requests库学习">
+  <meta name="twitter:description" content="requests库使用 requests方法 方法 描述 requests.get(url, params, **args) 发送 GET 请求到指定 url requests.post(url, data, json, **args) 发送 POST 请求到指定 url requests.head(url, **args) 发送 HEAD 请求到指定 url requests.patch(url, data, **args) 发送 PATCH 请求到指定 url requests.delete(url, **args) 发送 DELETE 请求到指定 url requests.put(url, data, **args) 发送 PUT 请求到指定 url requests.request(method, url, **args) 向指定的 url 发送指定的请求方法 requests响应信息 属性或方法 说明 url 返回响应的 URL text 返回响应的内容，unicode 类型数据 status_code 返回 http 的状态码，比如 404 和 200（200 是 OK，404 是 Not Found） raise_for_status() 如果发生错误，方法返回一个 HTTPError 对象 encoding 解码 r.text 的编码方式 apparent_encoding 编码方式 content 返回响应的内容，以字节为单位 headers 返回响应头，字典格式 close() 关闭与服务器的连接 cookies 返回一个 CookieJar 对象，包含了从服务器发回的 cookie history 返回包含请求历史的响应对象列表（url） json() 返回结果的 JSON 对象 (结果需要以 JSON 格式编写的，否则会引发错误) next 返回重定向链中下一个请求的 PreparedRequest 对象 ok 检查 &#34;status_code&#34; 的值，如果小于400，则返回 True，如果不小于 400，则返回 False reason 响应状态的描述，比如 &#34;Not Found&#34; 或 &#34;OK&#34; request 返回请求此响应的请求对象 links 返回响应的解析头链接 is_permanent_redirect 如果响应是永久重定向的 url，则返回 True，否则返回 False is_redirect 如果响应被重定向，则返回 True，否则返回 False iter_content() 迭代响应 iter_lines() 迭代响应的行 elapsed 返回一个 timedelta 对象，包含了从发送请求到响应到达之间经过的时间量，可以用于测试响应速度。比如 r.elapsed.microseconds 表示响应到达需要多少微秒。 get和post区别 requests.get(url, params, **args)通过params(字符串)进行传参">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/" title="Requests库学习 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/" title="PE文件加载器" /><link rel="next" type="text/html" href="http://localhost:1313/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" title="TLS回调函数" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/index.md" title="Requests库学习 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Requests库学习",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/requests%E5%BA%93%E5%AD%A6%E4%B9%A0\/"
+    },"genre": "posts","wordcount":  737 ,
+    "url": "http:\/\/localhost:1313\/posts\/requests%E5%BA%93%E5%AD%A6%E4%B9%A0\/","datePublished": "2024-12-12T16:35:53+08:00","dateModified": "2024-12-12T16:35:53+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "lo1see"
+      },"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>Requests库学习</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/avater.png" alt="lo1see" data-title="lo1see" width="20" height="20" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;lo1see</span></span></div><div class="post-meta-line"><span title="发布于 2024-12-12 16:35:53"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="121235-1212-1212">121235-1212-1212</time></span>&nbsp;<span title="737 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 800 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 2 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#requests方法">requests方法</a></li>
+    <li><a href="#requests响应信息">requests响应信息</a></li>
+    <li><a href="#get和post区别">get和post区别</a></li>
+    <li><a href="#ua伪装">UA伪装</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="requests库使用" class="heading-element"><span>requests库使用</span>
+  <a href="#requests%e5%ba%93%e4%bd%bf%e7%94%a8" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="requests方法" class="heading-element"><span>requests方法</span>
+  <a href="#requests%e6%96%b9%e6%b3%95" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">方法</th>
+          <th style="text-align: left">描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><code>requests.get(url, params, **args)</code></td>
+          <td style="text-align: left"><code>发送 GET 请求到指定 url</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>requests.post(url, data, json, **args)</code></td>
+          <td style="text-align: left"><code>发送 POST 请求到指定 url</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>requests.head(url, **args)</code></td>
+          <td style="text-align: left"><code>发送 HEAD 请求到指定 url</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>requests.patch(url, data, **args)</code></td>
+          <td style="text-align: left"><code>发送 PATCH 请求到指定 url</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>requests.delete(url, **args)</code></td>
+          <td style="text-align: left"><code>发送 DELETE 请求到指定 url</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>requests.put(url, data, **args)</code></td>
+          <td style="text-align: left"><code>发送 PUT 请求到指定 url</code></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><code>requests.request(method, url, **args)</code></td>
+          <td style="text-align: left"><code>向指定的 url 发送指定的请求方法</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="requests响应信息" class="heading-element"><span>requests响应信息</span>
+  <a href="#requests%e5%93%8d%e5%ba%94%e4%bf%a1%e6%81%af" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><table>
+  <thead>
+      <tr>
+          <th>属性或方法</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>url</code></td>
+          <td><code>返回响应的 URL</code></td>
+      </tr>
+      <tr>
+          <td><code>text</code></td>
+          <td><code>返回响应的内容，unicode 类型数据</code></td>
+      </tr>
+      <tr>
+          <td><code>status_code</code></td>
+          <td><code>返回 http 的状态码，比如 404 和 200（200 是 OK，404 是 Not Found）</code></td>
+      </tr>
+      <tr>
+          <td><code>raise_for_status()</code></td>
+          <td><code>如果发生错误，方法返回一个 HTTPError 对象</code></td>
+      </tr>
+      <tr>
+          <td><code>encoding</code></td>
+          <td><code>解码 r.text 的编码方式</code></td>
+      </tr>
+      <tr>
+          <td><code>apparent_encoding</code></td>
+          <td><code>编码方式</code></td>
+      </tr>
+      <tr>
+          <td><code>content</code></td>
+          <td><code>返回响应的内容，以字节为单位</code></td>
+      </tr>
+      <tr>
+          <td><code>headers</code></td>
+          <td><code>返回响应头，字典格式</code></td>
+      </tr>
+      <tr>
+          <td><code>close()</code></td>
+          <td><code>关闭与服务器的连接</code></td>
+      </tr>
+      <tr>
+          <td><code>cookies</code></td>
+          <td><code>返回一个 CookieJar 对象，包含了从服务器发回的 cookie</code></td>
+      </tr>
+      <tr>
+          <td><code>history</code></td>
+          <td><code>返回包含请求历史的响应对象列表（url）</code></td>
+      </tr>
+      <tr>
+          <td><code>json()</code></td>
+          <td><code>返回结果的 JSON 对象 (结果需要以 JSON 格式编写的，否则会引发错误)</code></td>
+      </tr>
+      <tr>
+          <td><code>next</code></td>
+          <td><code>返回重定向链中下一个请求的 PreparedRequest 对象</code></td>
+      </tr>
+      <tr>
+          <td><code>ok</code></td>
+          <td><code>检查 &quot;status_code&quot; 的值，如果小于400，则返回 True，如果不小于 400，则返回 False</code></td>
+      </tr>
+      <tr>
+          <td><code>reason</code></td>
+          <td><code>响应状态的描述，比如 &quot;Not Found&quot; 或 &quot;OK&quot;</code></td>
+      </tr>
+      <tr>
+          <td><code>request</code></td>
+          <td><code>返回请求此响应的请求对象</code></td>
+      </tr>
+      <tr>
+          <td><code>links</code></td>
+          <td><code>返回响应的解析头链接</code></td>
+      </tr>
+      <tr>
+          <td><code>is_permanent_redirect</code></td>
+          <td><code>如果响应是永久重定向的 url，则返回 True，否则返回 False</code></td>
+      </tr>
+      <tr>
+          <td><code>is_redirect</code></td>
+          <td><code>如果响应被重定向，则返回 True，否则返回 False</code></td>
+      </tr>
+      <tr>
+          <td><code>iter_content()</code></td>
+          <td><code>迭代响应</code></td>
+      </tr>
+      <tr>
+          <td><code>iter_lines()</code></td>
+          <td><code>迭代响应的行</code></td>
+      </tr>
+      <tr>
+          <td><code>elapsed</code></td>
+          <td><code>返回一个 timedelta 对象，包含了从发送请求到响应到达之间经过的时间量，可以用于测试响应速度。比如 r.elapsed.microseconds 表示响应到达需要多少微秒。</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="get和post区别" class="heading-element"><span>get和post区别</span>
+  <a href="#get%e5%92%8cpost%e5%8c%ba%e5%88%ab" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><code>requests.get(url, params, **args)</code>通过<code>params(字符串)</code>进行传参</p>
+<p><code>requests.post(url, data, json, **args)</code>通过<code>data(字典)</code>或者<code>json(字典)</code>进行传参</p>
+<h2 id="ua伪装" class="heading-element"><span>UA伪装</span>
+  <a href="#ua%e4%bc%aa%e8%a3%85" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>修改headers字典里的<code>User-Agent</code>参数，例如这样</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span><span class="s1">&#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586&#39;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Connection&#39;</span><span class="p">:</span> <span class="s1">&#39;keep-alive&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Cache-Control&#39;</span><span class="p">:</span> <span class="s1">&#39;max-age=0&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;sec-ch-ua&#39;</span><span class="p">:</span> <span class="s1">&#39;&#34;Google Chrome&#34;;v=&#34;89&#34;, &#34;Chromium&#34;;v=&#34;89&#34;, &#34;;Not A Brand&#34;;v=&#34;99&#34;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;sec-ch-ua-mobile&#39;</span><span class="p">:</span> <span class="s1">&#39;?0&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Upgrade-Insecure-Requests&#39;</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="s1">&#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Sec-Fetch-Site&#39;</span><span class="p">:</span> <span class="s1">&#39;same-origin&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Sec-Fetch-Mode&#39;</span><span class="p">:</span> <span class="s1">&#39;navigate&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Sec-Fetch-User&#39;</span><span class="p">:</span> <span class="s1">&#39;?1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Sec-Fetch-Dest&#39;</span><span class="p">:</span> <span class="s1">&#39;document&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Referer&#39;</span><span class="p">:</span> <span class="s1">&#39;https://bj.ke.com/&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"> <span class="s1">&#39;Accept-Language&#39;</span><span class="p">:</span> <span class="s1">&#39;zh-CN,zh;q=0.9&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-12 16:35:53">更新于 121235-1212-1212&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/" data-title="Requests库学习"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/requests%E5%BA%93%E5%AD%A6%E4%B9%A0/" data-title="Requests库学习"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/%E6%99%AE%E9%80%9A%E7%9A%84pe%E5%8A%A0%E8%BD%BD%E5%99%A8/" class="post-nav-item" rel="prev" title="PE文件加载器"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>PE文件加载器</a><a href="/posts/tls%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" class="post-nav-item" rel="next" title="TLS回调函数">TLS回调函数<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>
