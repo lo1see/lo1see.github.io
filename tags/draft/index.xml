@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Draft - 标签 - lo1see</title>
+    <link>http://localhost:1313/tags/draft/</link>
+    <description>随手简记</description>
+    <generator>Hugo 0.139.4 &amp; FixIt v0.3.16</generator>
+    <language>zh-CN</language>
+    <managingEditor>2296161885@qq.com (lo1see)</managingEditor>
+    <webMaster>2296161885@qq.com (lo1see)</webMaster>
+    <copyright>© 2024, 怜音 - lo1see</copyright>
+    <lastBuildDate>Sat, 14 Dec 2024 20:09:26 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/draft/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>X64dbg插件HelloWorld编写</title>
+      <link>http://localhost:1313/posts/0536f32/</link>
+      <pubDate>Sat, 14 Dec 2024 20:09:26 +0800</pubDate>
+      <guid>http://localhost:1313/posts/0536f32/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>X64dbg插件HelloWorld编写</description>
+    </item>
+  </channel>
+</rss>

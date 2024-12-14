@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>X64dbg插件HelloWorld编写 - lo1see</title><meta name="author" content="">
+<meta name="description" content="随手简记"><meta name="keywords" content='draft'>
+  <meta itemprop="name" content="X64dbg插件HelloWorld编写">
+  <meta itemprop="description" content="随手简记">
+  <meta itemprop="datePublished" content="2024-12-14T20:09:26+08:00">
+  <meta itemprop="dateModified" content="2024-12-14T20:09:26+08:00">
+  <meta itemprop="wordCount" content="2013">
+  <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/0536f32/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="X64dbg插件HelloWorld编写">
+  <meta property="og:description" content="随手简记">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-14T20:09:26+08:00">
+    <meta property="article:modified_time" content="2024-12-14T20:09:26+08:00">
+    <meta property="article:tag" content="Draft">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="X64dbg插件HelloWorld编写">
+  <meta name="twitter:description" content="随手简记">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/0536f32/" title="X64dbg插件HelloWorld编写 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/%E9%80%86%E6%A0%B816%E7%AB%A0_%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D/" title="逆核——16章_基址重定位" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/0536f32/index.md" title="X64dbg插件HelloWorld编写 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "X64dbg插件HelloWorld编写",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/0536f32\/"
+    },"genre": "posts","keywords": "draft","wordcount":  2013 ,
+    "url": "http:\/\/localhost:1313\/posts\/0536f32\/","datePublished": "2024-12-14T20:09:26+08:00","dateModified": "2024-12-14T20:09:26+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>X64dbg插件HelloWorld编写</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-14 20:09:26"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="14149-1214-1214">14149-1214-1214</time></span>&nbsp;<span title="2013 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 2100 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 5 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#1环境配置">1.环境配置</a></li>
+    <li><a href="#2helloworld插件">2.HelloWorld插件</a>
+      <ul>
+        <li><a href="#基本导出函数">基本导出函数</a>
+          <ul>
+            <li><a href="#pluginit">pluginit</a></li>
+            <li><a href="#plugsetup和plugstop">plugsetup和plugstop</a></li>
+            <li><a href="#事件回调函数">事件回调函数</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#3库函数">3.库函数</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="x64dbg插件开发笔记" class="heading-element"><span>x64dbg插件开发笔记</span>
+  <a href="#x64dbg%e6%8f%92%e4%bb%b6%e5%bc%80%e5%8f%91%e7%ac%94%e8%ae%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="1环境配置" class="heading-element"><span>1.环境配置</span>
+  <a href="#1%e7%8e%af%e5%a2%83%e9%85%8d%e7%bd%ae" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>解压x64dbg工具包，可以得到pluginsdk文件夹，这是开发插件所需要的SDK包</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204504170.png" alt="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204504170.png" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204504170.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204504170.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204504170.png?size=large 2x" data-title="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204504170.png" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>新建一个空项目，创建<code>pluginmain.h</code>和<code>pluginmain.cpp</code></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190145886.png" alt="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190145886.png" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190145886.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190145886.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190145886.png?size=large 2x" data-title="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190145886.png" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>打开<code>项目-&gt;xx项目属性</code>，在<code>配置属性-&gt;C/C++-&gt;常规</code>中的<code>附加包含目录</code>中添加SDK文件夹，添加库函数</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204619299.png" alt="image-20241212204619299" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204619299.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204619299.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204619299.png?size=large 2x" data-title="image-20241212204619299" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>打开<code>项目-&gt;xx项目属性</code>，在<code>配置属性-&gt;链接器-&gt;常规</code>中的<code>附加包含库目录</code>中添加SDK文件夹，添加lib静态链接库</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204834661.png" alt="image-20241212204834661" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204834661.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204834661.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241212204834661.png?size=large 2x" data-title="image-20241212204834661" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>修改<code>配置属性-&gt;常规</code>中的<code>配置类型</code>为<code>动态库(.dll)</code></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190340112.png" alt="image-20241214190340112" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190340112.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190340112.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214190340112.png?size=large 2x" data-title="image-20241214190340112" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h2 id="2helloworld插件" class="heading-element"><span>2.HelloWorld插件</span>
+  <a href="#2helloworld%e6%8f%92%e4%bb%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>x64dbg官方插件模板：https://github.com/x64dbg/PluginTemplate</p>
+<p>其他都有点复杂，先CV一份现成的helloworld看看样子</p>
+<p>pluginmain.h</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="cp">#pragma once
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma once
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// Plugin information
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define PLUGIN_NAME &#34;Hello_lo1see&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define PLUGIN_VERSION 1
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./bridgemain.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_plugins.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_argument.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_assembler.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_bookmark.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_comment.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_debug.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_flag.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_function.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_gui.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_label.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_memory.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_misc.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_module.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_pattern.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_register.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_stack.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./_scriptapi_symbol.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./DeviceNameResolver/DeviceNameResolver.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./jansson/jansson.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./lz4/lz4file.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./TitanEngine/TitanEngine.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;./XEDParse/XEDParse.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./x64dbg.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./x64bridge.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./DeviceNameResolver/DeviceNameResolver_x64.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./jansson/jansson_x64.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./lz4/lz4_x64.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./TitanEngine/TitanEngine_x64.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./XEDParse/XEDParse_x64.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./x32dbg.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./x32bridge.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./DeviceNameResolver/DeviceNameResolver_x86.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./jansson/jansson_x86.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./lz4/lz4_x86.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./TitanEngine/TitanEngine_x86.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#pragma comment(lib, &#34;./XEDParse/XEDParse_x86.lib&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#endif </span><span class="c1">//_WIN64
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define Cmd(x) DbgCmdExecDirect(x)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define Eval(x) DbgValFromString(x)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define dprintf(x, ...) _plugin_logprintf(&#34;[&#34; PLUGIN_NAME &#34;] &#34; x, __VA_ARGS__)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define dputs(x) _plugin_logprintf(&#34;[&#34; PLUGIN_NAME &#34;] %s\n&#34;, x)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define PLUG_EXPORT extern &#34;C&#34; __declspec(dllexport)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">//superglobal variables
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="kt">int</span> <span class="n">pluginHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="n">HWND</span> <span class="n">hwndDlg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="kt">int</span> <span class="n">hMenu</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="kt">int</span> <span class="n">hMenuDisasm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="kt">int</span> <span class="n">hMenuDump</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="kt">int</span> <span class="n">hMenuStack</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//functions
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">pluginInit</span><span class="p">(</span><span class="n">PLUG_INITSTRUCT</span><span class="o">*</span> <span class="n">initStruct</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">pluginStop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">pluginSetup</span><span class="p">();</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>pluginmain.cpp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;pluginmain.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;Windows.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;process.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">pluginHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">HWND</span> <span class="n">hwndDlg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">hMenu</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">hMenuDisasm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">hMenuDump</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">hMenuStack</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 导出函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">void</span> <span class="n">CBMENUENTRY</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_MENUENTRY</span> <span class="o">*</span> <span class="n">info</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">void</span> <span class="n">plugsetup</span><span class="p">(</span><span class="n">PLUG_SETUPSTRUCT</span> <span class="o">*</span> <span class="n">setupStruct</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">bool</span> <span class="n">pluginit</span><span class="p">(</span><span class="n">PLUG_INITSTRUCT</span> <span class="o">*</span> <span class="n">initStruct</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 在这里初始化插件数据。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">pluginInit</span><span class="p">(</span><span class="n">PLUG_INITSTRUCT</span><span class="o">*</span> <span class="n">initStruct</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 返回false以取消加载插件。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 在此处取消初始化插件数据。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">pluginStop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 在这里做GUI/菜单相关的事情。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">pluginSetup</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 菜单被点击回调
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">CBMENUENTRY</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_MENUENTRY</span><span class="o">*</span> <span class="n">info</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">hEntry</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>    <span class="c1">//注册时填的菜单ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">MessageBoxA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#34;插件 1 运行成功咯&#34;</span><span class="p">,</span> <span class="s">&#34;hello lo1see&#34;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">MessageBoxA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#34;插件 2 运行成功咯&#34;</span><span class="p">,</span> <span class="s">&#34;hello lo1see&#34;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 此菜单用于实现功能，并测试
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">MessageBoxA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#34;插件 3 运行成功咯&#34;</span><span class="p">,</span> <span class="s">&#34;hello lo1see&#34;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">PLUG_EXPORT</span> <span class="kt">bool</span> <span class="nf">pluginit</span><span class="p">(</span><span class="n">PLUG_INITSTRUCT</span><span class="o">*</span> <span class="n">initStruct</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginVersion</span> <span class="o">=</span> <span class="n">PLUGIN_VERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">sdkVersion</span> <span class="o">=</span> <span class="n">PLUG_SDKVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">strncpy_s</span><span class="p">(</span><span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginName</span><span class="p">,</span> <span class="n">PLUGIN_NAME</span><span class="p">,</span> <span class="n">_TRUNCATE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pluginHandle</span> <span class="o">=</span> <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 插件初始化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">sdkVersion</span> <span class="o">=</span> <span class="n">PLUG_SDKVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginVersion</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span> <span class="o">=</span> <span class="s">&#34;CheckPlugin --&gt;&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memset</span><span class="p">(</span><span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginName</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memcpy</span><span class="p">(</span><span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginName</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">name</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">pluginInit</span><span class="p">(</span><span class="n">initStruct</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">PLUG_EXPORT</span> <span class="kt">bool</span> <span class="nf">plugstop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pluginStop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">PLUG_EXPORT</span> <span class="kt">void</span> <span class="nf">plugsetup</span><span class="p">(</span><span class="n">PLUG_SETUPSTRUCT</span><span class="o">*</span> <span class="n">setupStruct</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hwndDlg</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hwndDlg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenu</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenuDisasm</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenuDisasm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenuDump</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenuDump</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenuStack</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenuStack</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 增加二级菜单
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span> <span class="n">sub_menu01</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#34;Hello Lo1see 01&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">sub_menu02</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#34;Hello Lo1see 02&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">sub_menu03</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#34;Hello Lo1see 03&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_plugin_menuaddentry</span><span class="p">(</span><span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sub_menu01</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_plugin_menuaddentry</span><span class="p">(</span><span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sub_menu02</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_plugin_menuaddentry</span><span class="p">(</span><span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">sub_menu03</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">pluginSetup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译成功后得到的.dll文件，根据不同版本需要将其更改为<code>*.dp32</code>或者<code>*.dp64</code>以此来代表这是一个插件，并将更改好的插件放入到<code>x32/plugins</code>目录下，重启<code>x64dbg</code>至此即可看到插件已经被加载成功。</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214192207849.png" alt="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214192207849.png" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214192207849.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214192207849.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214192207849.png?size=large 2x" data-title="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241214192207849.png" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h3 id="基本导出函数" class="heading-element"><span>基本导出函数</span>
+  <a href="#%e5%9f%ba%e6%9c%ac%e5%af%bc%e5%87%ba%e5%87%bd%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>是作为xdbg插件必须导出的函数，供xdbg来调用</p>
+<h4 id="pluginit" class="heading-element"><span>pluginit</span>
+  <a href="#pluginit" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">bool</span> <span class="n">pluginit</span><span class="p">(</span><span class="n">PLUG_INITSTRUCT</span> <span class="o">*</span> <span class="n">initStruct</span><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要在pluginit函数中填充参数和基本信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="n">PLUG_EXPORT</span> <span class="kt">bool</span> <span class="nf">pluginit</span><span class="p">(</span><span class="n">PLUG_INITSTRUCT</span><span class="o">*</span> <span class="n">initStruct</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginVersion</span> <span class="o">=</span> <span class="n">PLUGIN_VERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">sdkVersion</span> <span class="o">=</span> <span class="n">PLUG_SDKVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">strncpy_s</span><span class="p">(</span><span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginName</span><span class="p">,</span> <span class="n">PLUGIN_NAME</span><span class="p">,</span> <span class="n">_TRUNCATE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pluginHandle</span> <span class="o">=</span> <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 插件初始化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">sdkVersion</span> <span class="o">=</span> <span class="n">PLUG_SDKVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginVersion</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span> <span class="o">=</span> <span class="s">&#34;CheckPlugin --&gt;&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memset</span><span class="p">(</span><span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginName</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">memcpy</span><span class="p">(</span><span class="n">initStruct</span><span class="o">-&gt;</span><span class="n">pluginName</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">name</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">pluginInit</span><span class="p">(</span><span class="n">initStruct</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="plugsetup和plugstop" class="heading-element"><span>plugsetup和plugstop</span>
+  <a href="#plugsetup%e5%92%8cplugstop" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li>plugstop：插件被移除的时候被调用，可以用来清除注册的回调和命令，清理资源</li>
+<li>plugsetup：当插件初始化成功的时候调用，可以在这里添加菜单、做其他的界面相关的事情</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="n">PLUG_EXPORT</span> <span class="kt">bool</span> <span class="nf">plugstop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pluginStop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">PLUG_EXPORT</span> <span class="kt">void</span> <span class="nf">plugsetup</span><span class="p">(</span><span class="n">PLUG_SETUPSTRUCT</span><span class="o">*</span> <span class="n">setupStruct</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hwndDlg</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hwndDlg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenu</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenuDisasm</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenuDisasm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenuDump</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenuDump</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hMenuStack</span> <span class="o">=</span> <span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenuStack</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 增加二级菜单
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span> <span class="n">sub_menu01</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#34;Hello Lo1see 01&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">sub_menu02</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#34;Hello Lo1see 02&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">sub_menu03</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#34;Hello Lo1see 03&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_plugin_menuaddentry</span><span class="p">(</span><span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sub_menu01</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_plugin_menuaddentry</span><span class="p">(</span><span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sub_menu02</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_plugin_menuaddentry</span><span class="p">(</span><span class="n">setupStruct</span><span class="o">-&gt;</span><span class="n">hMenu</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">sub_menu03</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">pluginSetup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>也可以什么都不做，非必须</p>
+<h4 id="事件回调函数" class="heading-element"><span>事件回调函数</span>
+  <a href="#%e4%ba%8b%e4%bb%b6%e5%9b%9e%e8%b0%83%e5%87%bd%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">void</span> <span class="n">CBINITDEBUG</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_INITDEBUG</span><span class="o">*</span> <span class="n">info</span><span class="p">);</span> <span class="c1">//初始化调试
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">void</span> <span class="n">CBSTOPDEBUG</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_STOPDEBUG</span><span class="o">*</span> <span class="n">info</span><span class="p">);</span> <span class="c1">//停止调试
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">void</span> <span class="n">CBEXCEPTION</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_EXCEPTION</span><span class="o">*</span> <span class="n">info</span><span class="p">);</span> <span class="c1">//异常
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">void</span> <span class="n">CBDEBUGEVENT</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_DEBUGEVENT</span><span class="o">*</span> <span class="n">info</span><span class="p">);</span> <span class="c1">//调试事件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="s">&#34;C&#34;</span> <span class="kr">__declspec</span><span class="p">(</span><span class="n">dllexport</span><span class="p">)</span> <span class="kt">void</span> <span class="n">CBMENUENTRY</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_MENUENTRY</span><span class="o">*</span> <span class="n">info</span><span class="p">);</span> <span class="c1">//点击子菜单
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>参数中所用到的结构体可以在这里找到：https://help.x64dbg.com/en/latest/developers/plugins/Callbacks/index.html</p>
+<p>只要是满足CB*的导出函数，且属于这里面的类型https://help.x64dbg.com/en/latest/developers/plugins/API/registercallback.html，应该都可以注册成功</p>
+<p>本例只实现了点击子菜单，弹窗显示<code>hello world</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="c1">// 菜单被点击回调
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">CBMENUENTRY</span><span class="p">(</span><span class="n">CBTYPE</span> <span class="n">cbType</span><span class="p">,</span> <span class="n">PLUG_CB_MENUENTRY</span><span class="o">*</span> <span class="n">info</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">hEntry</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>    <span class="c1">//注册时填的菜单ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">MessageBoxA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#34;插件 1 运行成功咯&#34;</span><span class="p">,</span> <span class="s">&#34;hello lo1see&#34;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">MessageBoxA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#34;插件 2 运行成功咯&#34;</span><span class="p">,</span> <span class="s">&#34;hello lo1see&#34;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 此菜单用于实现功能，并测试
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">MessageBoxA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#34;插件 3 运行成功咯&#34;</span><span class="p">,</span> <span class="s">&#34;hello lo1see&#34;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3库函数" class="heading-element"><span>3.库函数</span>
+  <a href="#3%e5%ba%93%e5%87%bd%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>如果有需要实现的功能再查文档找找api罢</p>
+<p>文档：https://help.x64dbg.com/en/latest/developers/functions/debug/index.html</p></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-14 20:09:26">更新于 14149-1214-1214&nbsp;</span>
+      </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/0536f32/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/0536f32/" data-title="X64dbg插件HelloWorld编写" data-hashtags="draft"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/0536f32/" data-hashtag="draft"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/0536f32/" data-title="X64dbg插件HelloWorld编写"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/draft/" class="post-tag" title="标签 - Draft">Draft</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/%E9%80%86%E6%A0%B816%E7%AB%A0_%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D/" class="post-nav-item" rel="prev" title="逆核——16章_基址重定位"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>逆核——16章_基址重定位</a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

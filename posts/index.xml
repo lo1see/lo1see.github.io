@@ -9,8 +9,16 @@
     <managingEditor>2296161885@qq.com (lo1see)</managingEditor>
     <webMaster>2296161885@qq.com (lo1see)</webMaster>
     <copyright>© 2024, 怜音 - lo1see</copyright>
-    <lastBuildDate>Thu, 12 Dec 2024 17:07:50 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 14 Dec 2024 20:09:26 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>X64dbg插件HelloWorld编写</title>
+      <link>http://localhost:1313/posts/0536f32/</link>
+      <pubDate>Sat, 14 Dec 2024 20:09:26 +0800</pubDate>
+      <guid>http://localhost:1313/posts/0536f32/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>X64dbg插件HelloWorld编写</description>
+    </item>
     <item>
       <title>逆核——16章_基址重定位</title>
       <link>http://localhost:1313/posts/%E9%80%86%E6%A0%B816%E7%AB%A0_%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D/</link>
