@@ -2,37 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/categories/</loc>
-    <lastmod>2024-12-14T20:09:26+08:00</lastmod>
+    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/tags/draft/</loc>
-    <lastmod>2024-12-14T20:09:26+08:00</lastmod>
+    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/categories/draft/</loc>
-    <lastmod>2024-12-14T20:09:26+08:00</lastmod>
+    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2024-12-14T20:09:26+08:00</lastmod>
+    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2024-12-14T20:09:26+08:00</lastmod>
+    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2024-12-14T20:09:26+08:00</lastmod>
+    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/c4731d7/</loc>
+    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/0456abb/</loc>
+    <lastmod>2024-12-20T18:10:43+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/72b7e58/</loc>
+    <lastmod>2024-12-20T18:08:49+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

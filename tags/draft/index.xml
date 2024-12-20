@@ -9,8 +9,32 @@
     <managingEditor>2296161885@qq.com (lo1see)</managingEditor>
     <webMaster>2296161885@qq.com (lo1see)</webMaster>
     <copyright>© 2024, 怜音 - lo1see</copyright>
-    <lastBuildDate>Sat, 14 Dec 2024 20:09:26 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 20 Dec 2024 18:13:07 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/draft/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>VMP IAT修复学习</title>
+      <link>http://localhost:1313/posts/c4731d7/</link>
+      <pubDate>Fri, 20 Dec 2024 18:13:07 +0800</pubDate>
+      <guid>http://localhost:1313/posts/c4731d7/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>VMP IAT修复学习</description>
+    </item>
+    <item>
+      <title>Windows内核—系统描述符笔记—门</title>
+      <link>http://localhost:1313/posts/0456abb/</link>
+      <pubDate>Fri, 20 Dec 2024 18:10:43 +0800</pubDate>
+      <guid>http://localhost:1313/posts/0456abb/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>Windows内核—系统描述符笔记—门</description>
+    </item>
+    <item>
+      <title>Windows内核—系统描述符笔记—段</title>
+      <link>http://localhost:1313/posts/72b7e58/</link>
+      <pubDate>Fri, 20 Dec 2024 18:08:49 +0800</pubDate>
+      <guid>http://localhost:1313/posts/72b7e58/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>Windows内核—系统描述符笔记—段</description>
+    </item>
     <item>
       <title>X64dbg插件HelloWorld编写</title>
       <link>http://localhost:1313/posts/0536f32/</link>

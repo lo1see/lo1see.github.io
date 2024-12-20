@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>VMP IAT修复学习 - lo1see</title><meta name="author" content="">
+<meta name="description" content="随手简记"><meta name="keywords" content='draft'>
+  <meta itemprop="name" content="VMP IAT修复学习">
+  <meta itemprop="description" content="随手简记">
+  <meta itemprop="datePublished" content="2024-12-20T18:13:07+08:00">
+  <meta itemprop="dateModified" content="2024-12-20T18:13:07+08:00">
+  <meta itemprop="wordCount" content="1937">
+  <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/c4731d7/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="VMP IAT修复学习">
+  <meta property="og:description" content="随手简记">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-20T18:13:07+08:00">
+    <meta property="article:modified_time" content="2024-12-20T18:13:07+08:00">
+    <meta property="article:tag" content="Draft">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="VMP IAT修复学习">
+  <meta name="twitter:description" content="随手简记">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/c4731d7/" title="VMP IAT修复学习 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/0456abb/" title="Windows内核—系统描述符笔记—门" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/c4731d7/index.md" title="VMP IAT修复学习 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "VMP IAT修复学习",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/c4731d7\/"
+    },"genre": "posts","keywords": "draft","wordcount":  1937 ,
+    "url": "http:\/\/localhost:1313\/posts\/c4731d7\/","datePublished": "2024-12-20T18:13:07+08:00","dateModified": "2024-12-20T18:13:07+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>VMP IAT修复学习</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-20 18:13:07"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="202013-1220-1220">202013-1220-1220</time></span>&nbsp;<span title="1937 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 2000 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 4 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#一vmp对导入表的处理方式">一、VMP对导入表的处理方式：</a>
+      <ul>
+        <li><a href="#方式一call段寄存器xxxx">方式一：<code>call	段寄存器:[xxxx]</code></a></li>
+        <li><a href="#方式二jmp段寄存器xxxx">方式二：<code>jmp	段寄存器:[xxxx]</code></a></li>
+        <li><a href="#方式三mov-reg-段寄存器xxxx-call-reg">方式三：<code>mov reg, 段寄存器:[xxxx]	 +	call reg</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#二整体修复思路">二、整体修复思路</a></li>
+    <li><a href="#三逻辑">三、逻辑</a>
+      <ul>
+        <li><a href="#寻找vmp节区">寻找VMP节区</a></li>
+        <li><a href="#搜索并过滤得到call-vmp0">搜索并过滤得到<code>call vmp0</code></a></li>
+        <li><a href="#模拟执行判断保护方式">模拟执行判断保护方式</a>
+          <ul>
+            <li><a href="#call段寄存器xxxx"><code>call	段寄存器:[xxxx]</code></a></li>
+            <li><a href="#jmp段寄存器xxxx"><code>jmp	段寄存器:[xxxx]</code></a>
+              <ul>
+                <li><a href="#51类型">5+1类型：</a></li>
+                <li><a href="#15类型">1+5类型：</a></li>
+                <li><a href="#特点">特点：</a></li>
+              </ul>
+            </li>
+            <li><a href="#mov-reg-段寄存器xxxx-call-reg"><code>mov reg, 段寄存器:[xxxx]	 +	call reg</code></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+    <li><a href="#改动">改动</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="vmp导入表恢复" class="heading-element"><span>VMP导入表恢复</span>
+  <a href="#vmp%e5%af%bc%e5%85%a5%e8%a1%a8%e6%81%a2%e5%a4%8d" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="一vmp对导入表的处理方式" class="heading-element"><span>一、VMP对导入表的处理方式：</span>
+  <a href="#%e4%b8%80vmp%e5%af%b9%e5%af%bc%e5%85%a5%e8%a1%a8%e7%9a%84%e5%a4%84%e7%90%86%e6%96%b9%e5%bc%8f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h3 id="方式一call段寄存器xxxx" class="heading-element"><span>方式一：<code>call	段寄存器:[xxxx]</code></span>
+  <a href="#%e6%96%b9%e5%bc%8f%e4%b8%80call%e6%ae%b5%e5%af%84%e5%ad%98%e5%99%a8xxxx" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>原来是<code>FF 15</code>的6字节<code>call</code>指令，保护后变为1字节的<code>push/pop  reg</code> + 5字节<code>E8 ??</code>的<code>call  vmp0</code>，或5字节<code>E8 ??</code>的<code>call  vmp0</code> + 1字节的任意垃圾指令</p>
+<p>原：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220332317.png" alt="image-20241219220332317" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220332317.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220332317.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220332317.png?size=large 2x" data-title="image-20241219220332317" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>1+5类型，VMP后：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220348670.png" alt="image-20241219220348670" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220348670.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220348670.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220348670.png?size=large 2x" data-title="image-20241219220348670" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>原：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220142180.png" alt="image-20241219220142180" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220142180.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220142180.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220142180.png?size=large 2x" data-title="image-20241219220142180" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>5+1类型，VMP后：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220226703.png" alt="image-20241219220226703" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220226703.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220226703.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220226703.png?size=large 2x" data-title="image-20241219220226703" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h3 id="方式二jmp段寄存器xxxx" class="heading-element"><span>方式二：<code>jmp	段寄存器:[xxxx]</code></span>
+  <a href="#%e6%96%b9%e5%bc%8f%e4%ba%8cjmp%e6%ae%b5%e5%af%84%e5%ad%98%e5%99%a8xxxx" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>原来是<code>FF 25</code>的6字节<code>jmp</code>指令，保护后变为1字节的<code>push/pop  reg</code> + 5字节<code>E8 ??</code>的<code>call  vmp0</code>，或5字节<code>E8 ??</code>的<code>call  vmp0</code> + 1字节的任意垃圾指令</p>
+<p>原：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220951445.png" alt="image-20241219220951445" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220951445.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220951445.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220951445.png?size=large 2x" data-title="image-20241219220951445" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>1+5类型，VMP后：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219221003187.png" alt="image-20241219221003187" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219221003187.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219221003187.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219221003187.png?size=large 2x" data-title="image-20241219221003187" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>原：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220733711.png" alt="image-20241219220733711" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220733711.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220733711.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220733711.png?size=large 2x" data-title="image-20241219220733711" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>5+1类型，VMP后</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220748028.png" alt="image-20241219220748028" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220748028.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220748028.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241219220748028.png?size=large 2x" data-title="image-20241219220748028" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h3 id="方式三mov-reg-段寄存器xxxx-call-reg" class="heading-element"><span>方式三：<code>mov reg, 段寄存器:[xxxx]	 +	call reg</code></span>
+  <a href="#%e6%96%b9%e5%bc%8f%e4%b8%89mov-reg-%e6%ae%b5%e5%af%84%e5%ad%98%e5%99%a8xxxx-call-reg" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>如果是5字节的mov，则直接变为5字节 E8的<code>call vmp0</code></p>
+<p>如果是6字节的mov，则变为1+5或者5+1类型 E8的<code>call vmp0</code></p>
+<h2 id="二整体修复思路" class="heading-element"><span>二、整体修复思路</span>
+  <a href="#%e4%ba%8c%e6%95%b4%e4%bd%93%e4%bf%ae%e5%a4%8d%e6%80%9d%e8%b7%af" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>根据前面找到的VMP对IAT的保护方式，可以发现统一的特征就是<code>E8</code>开头的<code>call vmp0</code>，于是利用这个特征，</p>
+<p>对text段进行搜索<code>E8</code>，得到一系列地址；
+反汇编并计算<code>call</code>的跳转目标地址，判断目标地址是不是跳出了当前节区，如果未跳出则过滤这条地址；
+对进一步得到的一系列地址进行<code>unicorn</code>模拟执行，对返回地址进行判断；
+如果是其他模块的导出函数，认为是原IAT表项</p>
+<h2 id="三逻辑" class="heading-element"><span>三、逻辑</span>
+  <a href="#%e4%b8%89%e9%80%bb%e8%be%91" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h3 id="寻找vmp节区" class="heading-element"><span>寻找VMP节区</span>
+  <a href="#%e5%af%bb%e6%89%bevmp%e8%8a%82%e5%8c%ba" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>计算节区内数据的熵值（Entropy），衡量数据的不确定性或信息量。因为VMP虚拟机中的代码有很多垃圾代码，随机性很高，所以可以用计算熵值的方式过滤得到VMP的节区，以免节区名称被修改找不到VMP节区</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">double</span> <span class="nf">calcEntropy</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span> <span class="n">bytes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">double</span> <span class="n">Entropy</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint8_t</span><span class="p">,</span> <span class="kt">double</span><span class="o">&gt;</span> <span class="n">mapByteProbabilities</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint8_t</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="n">mapByteFrequencies</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="nl">byte</span> <span class="p">:</span> <span class="n">bytes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">mapByteFrequencies</span><span class="p">[</span><span class="n">byte</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="nl">pair</span> <span class="p">:</span> <span class="n">mapByteFrequencies</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">mapByteProbabilities</span><span class="p">[</span><span class="n">pair</span><span class="p">.</span><span class="n">first</span><span class="p">]</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">second</span><span class="p">)</span> <span class="o">/</span> <span class="n">bytes</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="nl">pair</span> <span class="p">:</span> <span class="n">mapByteProbabilities</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">Entropy</span> <span class="o">-=</span> <span class="n">pair</span><span class="p">.</span><span class="n">second</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">second</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">Entropy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="搜索并过滤得到call-vmp0" class="heading-element"><span>搜索并过滤得到<code>call vmp0</code></span>
+  <a href="#%e6%90%9c%e7%b4%a2%e5%b9%b6%e8%bf%87%e6%bb%a4%e5%be%97%e5%88%b0call-vmp0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>搜索以0xE8为第一字节的五字节特征码，再反编译计算call的跳转真实地址，超出当前节区且未超出当前模块，保存。</p>
+<h3 id="模拟执行判断保护方式" class="heading-element"><span>模拟执行判断保护方式</span>
+  <a href="#%e6%a8%a1%e6%8b%9f%e6%89%a7%e8%a1%8c%e5%88%a4%e6%96%ad%e4%bf%9d%e6%8a%a4%e6%96%b9%e5%bc%8f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>保存模拟执行前的起始地址，对<code>call vmp0</code>进行<code>unicorn</code>模拟执行，设置<code>UC_HOOK_CODE</code></p>
+<p>判断VMP对IAT是哪种保护类型：</p>
+<h4 id="call段寄存器xxxx" class="heading-element"><span><code>call	段寄存器:[xxxx]</code></span>
+  <a href="#call%e6%ae%b5%e5%af%84%e5%ad%98%e5%99%a8xxxx" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>返回时直接<code>retn</code>返回到目标函数地址</p>
+<p>例：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220121759312.png" alt="image-20241220121759312" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220121759312.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220121759312.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220121759312.png?size=large 2x" data-title="image-20241220121759312" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>读取<code>sp + sizeof(ULONG_PTR)</code>即栈中第二个值的地址，该地址若是<code>原addr + 5</code>则为1+5类型，若是<code>原addr + 6</code>则为5+1类型，保存记录</p>
+<h4 id="jmp段寄存器xxxx" class="heading-element"><span><code>jmp	段寄存器:[xxxx]</code></span>
+  <a href="#jmp%e6%ae%b5%e5%af%84%e5%ad%98%e5%99%a8xxxx" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>因为原<code>jmp</code>指令不会对堆栈进行操作，保护后变为了<code>call</code>影响了堆栈，所以在最后<code>ret</code>返回的时候会平衡堆栈  <code>ret sizeof(ULONG_PTR)</code>，32位是<code>ret 4</code>，64位是<code>ret 8</code>，最终返回地址也是目标函数地址</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220122018990.png" alt="image-20241220122018990" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220122018990.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220122018990.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220122018990.png?size=large 2x" data-title="image-20241220122018990" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>对于<code>jmp</code>类型不能取到返回地址，但是通过分析<code>call vmp0</code>内的指令可以发现两种保护类型的特点：</p>
+<h5 id="51类型" class="heading-element"><span>5+1类型：</span>
+  <a href="#51%e7%b1%bb%e5%9e%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h5><p>直接执行<code>call vmp0</code>进入保护函数</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125729792.png" alt="image-20241220125729792" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125729792.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125729792.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125729792.png?size=large 2x" data-title="image-20241220125729792" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><code>push rdi</code>保存本次用来寻找目标导入函数的<code>vRip寄存器</code></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125840313.png" alt="image-20241220125840313" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125840313.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125840313.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125840313.png?size=large 2x" data-title="image-20241220125840313" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>经过一系列运算最终得到目标函数地址，计算结果保存在<code>rdi</code>中；通过<code>xchg</code>指令取出<code>push rdi</code>保存的值；最后<code>ret 8</code>平衡堆栈</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125908657.png" alt="image-20241220125908657" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125908657.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125908657.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220125908657.png?size=large 2x" data-title="image-20241220125908657" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h5 id="15类型" class="heading-element"><span>1+5类型：</span>
+  <a href="#15%e7%b1%bb%e5%9e%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h5><p>先<code>push rbp</code>后<code>call vmp0</code>，<code>rbp</code>作为本次用来寻找目标导入函数的<code>vRip寄存器</code></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130145723.png" alt="image-20241220130145723" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130145723.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130145723.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130145723.png?size=large 2x" data-title="image-20241220130145723" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>把栈顶两数据调换位置，以便最终恢复<code>rbp</code></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130518044.png" alt="image-20241220130518044" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130518044.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130518044.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130518044.png?size=large 2x" data-title="image-20241220130518044" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130543619.png" alt="image-20241220130543619" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130543619.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130543619.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130543619.png?size=large 2x" data-title="image-20241220130543619" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>经过一系列解密后，最终<code>xchg [rsp], rbp</code>将计算后<code>rbp</code>中的<code>vRip</code>与栈顶存储的<code>rbp</code>原值置换，可以返回到目标导入函数中且恢复环境</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130701456.png" alt="image-20241220130701456" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130701456.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130701456.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220130701456.png?size=large 2x" data-title="image-20241220130701456" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h5 id="特点" class="heading-element"><span>特点：</span>
+  <a href="#%e7%89%b9%e7%82%b9" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h5><p>5+1类型是进入<code>call vmp0</code>之后保存<code>vRip寄存器</code>，计算<code>vRip值</code>之后利用<code>xchg</code>交换回原来的值，<code>call vmp0</code>执行前后除<code>sp</code>寄存器的值以外不会变动</p>
+<p>1+5类型是进入<code>call vmp0</code>之前保存<code>vRip寄存器</code>，进入之后交换栈顶两数据，计算<code>vRip值</code>之后用<code>xchg</code>将栈顶数据与<code>sp</code>寄存器交换，<code>call vmp0</code>执行前后除<code>sp</code>寄存器外还有<code>vRip寄存器</code>的值也发生了变动</p>
+<p>那么可以在unicorn模拟执行配置时，将除<code>sp</code>寄存器以外的寄存器设为0，将栈中数据设有值如0xFF，最终模拟执行到<code>ret sizeof(ULONG_PTR)</code>时判断是否有寄存器的值为非0值，若无则为<code>5+1类型</code>的<code>call vmp0</code>，若有则为<code>1+5类型</code>的<code>call vmp0</code></p>
+<h4 id="mov-reg-段寄存器xxxx-call-reg" class="heading-element"><span><code>mov reg, 段寄存器:[xxxx]	 +	call reg</code></span>
+  <a href="#mov-reg-%e6%ae%b5%e5%af%84%e5%ad%98%e5%99%a8xxxx-call-reg" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>因为这种方式保护的是<code>mov</code>指令，所以最终返回地址是<code>原地址 + 5/6</code>的地址，对应1+5或5+1的情况。</p>
+<p>同时在这个call中只会修改除<code>sp寄存器</code>外的一个寄存器，该寄存器就作为<code>vRip</code>寄存器存储目标导入函数。</p>
+<h2 id="参考" class="heading-element"><span>参考</span>
+  <a href="#%e5%8f%82%e8%80%83" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><a href="https://bbs.kanxue.com/thread-269008.htm"target="_blank" rel="external nofollow noopener noreferrer">VMP导入表修复-加壳脱壳-看雪-安全社区|安全招聘|kanxue.com</a></p>
+<p><a href="https://github.com/KuNgia09/vmp3-import-fix"target="_blank" rel="external nofollow noopener noreferrer">https://github.com/KuNgia09/vmp3-import-fix</a></p>
+<p><a href="https://github.com/colby57/VMP-Imports-Deobfuscator"target="_blank" rel="external nofollow noopener noreferrer">https://github.com/colby57/VMP-Imports-Deobfuscator</a></p>
+<p><a href="https://github.com/PlaneJun/VMP-Import-Fix"target="_blank" rel="external nofollow noopener noreferrer">https://github.com/PlaneJun/VMP-Import-Fix</a></p>
+<h2 id="改动" class="heading-element"><span>改动</span>
+  <a href="#%e6%94%b9%e5%8a%a8" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>学习整合了一下优秀VMP IAT修复工具的源码，修改添加了对x86架构的支持，以及添加了修复后的dump功能</p>
+<p>仓库：https://github.com/lo1see/VMP-IAT-recover</p></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-20 18:13:07">更新于 202013-1220-1220&nbsp;</span>
+      </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/c4731d7/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/c4731d7/" data-title="VMP IAT修复学习" data-hashtags="draft"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/c4731d7/" data-hashtag="draft"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/c4731d7/" data-title="VMP IAT修复学习"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/draft/" class="post-tag" title="标签 - Draft">Draft</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/0456abb/" class="post-nav-item" rel="prev" title="Windows内核—系统描述符笔记—门"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>Windows内核—系统描述符笔记—门</a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>
