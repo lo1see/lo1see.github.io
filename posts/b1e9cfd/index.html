@@ -11,7 +11,7 @@
   <meta itemprop="description" content="随手简记">
   <meta itemprop="datePublished" content="2024-12-21T21:30:34+08:00">
   <meta itemprop="dateModified" content="2024-12-21T21:30:34+08:00">
-  <meta itemprop="wordCount" content="4100">
+  <meta itemprop="wordCount" content="4169">
   <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/b1e9cfd/">
   <meta property="og:site_name" content="lo1see">
   <meta property="og:title" content="LLVM学习——控制流平坦化源码学习">
@@ -40,7 +40,7 @@
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "http:\/\/localhost:1313\/posts\/b1e9cfd\/"
-    },"genre": "posts","keywords": "draft","wordcount":  4100 ,
+    },"genre": "posts","keywords": "draft","wordcount":  4169 ,
     "url": "http:\/\/localhost:1313\/posts\/b1e9cfd\/","datePublished": "2024-12-21T21:30:34+08:00","dateModified": "2024-12-21T21:30:34+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
       "@type": "Organization",
       "name": ""},"description": ""
@@ -80,7 +80,7 @@
     <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>LLVM学习——控制流平坦化源码学习</span>
       </h1></div><div class="post-meta">
       <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
-      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-21 21:30:34"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="212130-1221-1221">212130-1221-1221</time></span>&nbsp;<span title="4100 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 4200 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 9 分钟</span>&nbsp;</div>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-21 21:30:34"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="212130-1221-1221">212130-1221-1221</time></span>&nbsp;<span title="4169 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 4200 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 9 分钟</span>&nbsp;</div>
     </div><div class="details toc" id="toc-static" data-kept="false">
         <div class="details-summary toc-title">
           <span>目录</span>
@@ -109,6 +109,7 @@
         <li><a href="#方案二">方案二</a></li>
       </ul>
     </li>
+    <li><a href="#后记">后记</a></li>
   </ul>
 </nav></div>
       </div><div class="content" id="content"><h2 id="ollvm控制流平坦化学习" class="heading-element"><span>OLLVM控制流平坦化学习</span>
@@ -983,7 +984,12 @@
 <p>与第一个方案不同，这个方案中优化合并的代码块不仅是真实块，也可以充当作为混淆的预处理块。若工具将这个快当成预处理块无视的话是无法正确分析出代码流程的，更加提高了反混淆难度。</p>
 <p>如我在某次比赛中遇到的的这道题，图中框住的两个代码块。当时比赛的时候做这道题我是把他当成混淆的很好的OLLVM题目来做的，无法分辨出来是真实代码块还是其他的预处理块。（不过所幸最后也是做出来了，赛后还发现其实不是OLLVM，而是VM题目，但这个控制流程图真的有点像OLLVM的吧！）</p>
 <p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241221205545731.png" alt="image-20241221205545731" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241221205545731.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241221205545731.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241221205545731.png?size=large 2x" data-title="image-20241221205545731" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
-<p>貌似这样的思路类似于编译器优化&hellip;..？</p></div><div class="post-footer" id="post-footer">
+<p>貌似这样的思路类似于编译器优化&hellip;..？</p>
+<h2 id="后记" class="heading-element"><span>后记</span>
+  <a href="#%e5%90%8e%e8%ae%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>忙忙忙好忙呜呜呜，虚假控制流、指令替换等源码就暂时不写文章了暂搁下呜呜。看过了一遍源码，感觉确实挺妙的，之后有空再来细品下写文章记录叭</p></div><div class="post-footer" id="post-footer">
   <div class="post-info">
     <div class="post-info-line">
       <div class="post-info-mod">
