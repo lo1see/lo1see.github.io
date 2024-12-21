@@ -11,7 +11,7 @@
   <meta itemprop="description" content="随手简记">
   <meta itemprop="datePublished" content="2024-12-21T21:30:34+08:00">
   <meta itemprop="dateModified" content="2024-12-21T21:30:34+08:00">
-  <meta itemprop="wordCount" content="4014">
+  <meta itemprop="wordCount" content="4100">
   <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/b1e9cfd/">
   <meta property="og:site_name" content="lo1see">
   <meta property="og:title" content="LLVM学习——控制流平坦化源码学习">
@@ -40,7 +40,7 @@
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "http:\/\/localhost:1313\/posts\/b1e9cfd\/"
-    },"genre": "posts","keywords": "draft","wordcount":  4014 ,
+    },"genre": "posts","keywords": "draft","wordcount":  4100 ,
     "url": "http:\/\/localhost:1313\/posts\/b1e9cfd\/","datePublished": "2024-12-21T21:30:34+08:00","dateModified": "2024-12-21T21:30:34+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
       "@type": "Organization",
       "name": ""},"description": ""
@@ -80,7 +80,7 @@
     <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>LLVM学习——控制流平坦化源码学习</span>
       </h1></div><div class="post-meta">
       <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
-      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-21 21:30:34"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="212130-1221-1221">212130-1221-1221</time></span>&nbsp;<span title="4014 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 4100 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 9 分钟</span>&nbsp;</div>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-21 21:30:34"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="212130-1221-1221">212130-1221-1221</time></span>&nbsp;<span title="4100 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 4200 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 9 分钟</span>&nbsp;</div>
     </div><div class="details toc" id="toc-static" data-kept="false">
         <div class="details-summary toc-title">
           <span>目录</span>
@@ -710,13 +710,13 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">-&gt;</span><span class="n">getTerminator</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getNumSuccessors</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">     <span class="c1">//************************\\
-</span></span></span><span class="line"><span class="cl"><span class="c1">        if(rand()&amp;0xf &gt; 0xa){
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="c1">//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span><span class="p">(</span><span class="n">rand</span><span class="p">()</span><span class="o">&amp;</span><span class="mh">0xf</span> <span class="o">&gt;</span> <span class="mh">0xa</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">     <span class="c1">//************************\\
-</span></span></span><span class="line"><span class="cl"><span class="c1">        
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="c1">// Get successor and delete terminator
+</span></span><span class="line"><span class="cl">     <span class="c1">//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        
+</span></span><span class="line"><span class="cl">      <span class="c1">// Get successor and delete terminator
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">BasicBlock</span> <span class="o">*</span><span class="n">succ</span> <span class="o">=</span> <span class="n">i</span><span class="o">-&gt;</span><span class="n">getTerminator</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getSuccessor</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">      <span class="n">i</span><span class="o">-&gt;</span><span class="n">getTerminator</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">eraseFromParent</span><span class="p">();</span>
 </span></span><span class="line"><span class="cl">      <span class="c1">//code......
@@ -759,11 +759,11 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl">    <span class="c1">// If it&#39;s a conditional jump
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">-&gt;</span><span class="n">getTerminator</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getNumSuccessors</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="c1">//*************\\
-</span></span></span><span class="line"><span class="cl"><span class="c1">          continue;
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="c1">//*************\\
-</span></span></span><span class="line"><span class="cl"><span class="c1">        
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="c1">// Get next cases
+</span></span><span class="line"><span class="cl">      <span class="c1">//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        
+</span></span><span class="line"><span class="cl">          <span class="c1">// Get next cases
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="n">ConstantInt</span> <span class="o">*</span><span class="n">numCaseTrue</span> <span class="o">=</span>
 </span></span><span class="line"><span class="cl">                  <span class="n">switchI</span><span class="o">-&gt;</span><span class="n">findCaseDest</span><span class="p">(</span><span class="n">i</span><span class="o">-&gt;</span><span class="n">getTerminator</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getSuccessor</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
 </span></span><span class="line"><span class="cl">          <span class="n">ConstantInt</span> <span class="o">*</span><span class="n">numCaseFalse</span> <span class="o">=</span>

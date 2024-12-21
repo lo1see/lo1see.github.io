@@ -386,11 +386,11 @@ BranchInst::Create(loopEnd, i);
 
 ```c&#43;&#43;
     if (i-&gt;getTerminator()-&gt;getNumSuccessors() == 1) {
-     //************************\\
+     //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
         if(rand()&amp;0xf &gt; 0xa){
             continue;
         }
-     //************************\\
+     //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
         
       // Get successor and delete terminator
       BasicBlock *succ = i-&gt;getTerminator()-&gt;getSuccessor(0);
@@ -417,9 +417,9 @@ static cl::opt&lt;int&gt;
 ```c&#43;&#43;
     // If it&#39;s a conditional jump
     if (i-&gt;getTerminator()-&gt;getNumSuccessors() == 2) {
-      //*************\\
+      //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
           continue;
-      //*************\\
+      //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
         
           // Get next cases
           ConstantInt *numCaseTrue =
