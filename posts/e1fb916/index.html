@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>LLVM学习——环境搭建 - lo1see</title><meta name="author" content="">
+<meta name="description" content="随手简记"><meta name="keywords" content='draft'>
+  <meta itemprop="name" content="LLVM学习——环境搭建">
+  <meta itemprop="description" content="随手简记">
+  <meta itemprop="datePublished" content="2024-12-21T21:21:27+08:00">
+  <meta itemprop="dateModified" content="2024-12-21T21:21:27+08:00">
+  <meta itemprop="wordCount" content="849">
+  <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/e1fb916/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="LLVM学习——环境搭建">
+  <meta property="og:description" content="随手简记">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-21T21:21:27+08:00">
+    <meta property="article:modified_time" content="2024-12-21T21:21:27+08:00">
+    <meta property="article:tag" content="Draft">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="LLVM学习——环境搭建">
+  <meta name="twitter:description" content="随手简记">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/e1fb916/" title="LLVM学习——环境搭建 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/c4731d7/" title="VMP IAT修复学习" /><link rel="next" type="text/html" href="http://localhost:1313/posts/8cffabc/" title="LLVM学习——Hello MyPass" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/e1fb916/index.md" title="LLVM学习——环境搭建 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "LLVM学习——环境搭建",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/e1fb916\/"
+    },"genre": "posts","keywords": "draft","wordcount":  849 ,
+    "url": "http:\/\/localhost:1313\/posts\/e1fb916\/","datePublished": "2024-12-21T21:21:27+08:00","dateModified": "2024-12-21T21:21:27+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>LLVM学习——环境搭建</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-21 21:21:27"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="212121-1221-1221">212121-1221-1221</time></span>&nbsp;<span title="849 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 900 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 2 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#下载">下载</a></li>
+    <li><a href="#配置编译环境">配置编译环境</a></li>
+    <li><a href="#编译">编译</a></li>
+    <li><a href="#测试clang">测试Clang</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="llvm环境搭建" class="heading-element"><span>LLVM环境搭建</span>
+  <a href="#llvm%e7%8e%af%e5%a2%83%e6%90%ad%e5%bb%ba" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>忙忙忙最近好忙，学习了有段时间了，回过头来整理下</p>
+<h2 id="下载" class="heading-element"><span>下载</span>
+  <a href="#%e4%b8%8b%e8%bd%bd" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>官方 LLVM releases：https://releases.llvm.org/</p>
+<p>github：https://github.com/llvm/llvm-project</p>
+<p>因为后续找到的OLLVM版本是14.x的，所以这里下载LLVM 14进行编译</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185412957.png" alt="image-20241220185412957" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185412957.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185412957.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185412957.png?size=large 2x" data-title="image-20241220185412957" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>拉到最下面下载源码</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185435681.png" alt="image-20241220185435681" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185435681.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185435681.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185435681.png?size=large 2x" data-title="image-20241220185435681" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>移动到Ubuntu中解压</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">tar -xzvf llvm-project-llvmorg-14.0.6.tar.gz</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185631740.png" alt="image-20241220185631740" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185631740.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185631740.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185631740.png?size=large 2x" data-title="image-20241220185631740" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h2 id="配置编译环境" class="heading-element"><span>配置编译环境</span>
+  <a href="#%e9%85%8d%e7%bd%ae%e7%bc%96%e8%af%91%e7%8e%af%e5%a2%83" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>确保机子符合编译环境要求</p>
+<p><a href="https://llvm.org/docs/GettingStarted.html#requirements"target="_blank" rel="external nofollow noopener noreferrer">https://llvm.org/docs/GettingStarted.html#requirements</a></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185750341.png" alt="image-20241220185750341" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185750341.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185750341.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220185750341.png?size=large 2x" data-title="image-20241220185750341" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>除此以外还要安装</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt-get install g++
+</span></span><span class="line"><span class="cl">sudo apt-get install make
+</span></span><span class="line"><span class="cl">sudo apt-get install cmake
+</span></span><span class="line"><span class="cl">sudo apt install ninja-build</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="编译" class="heading-element"><span>编译</span>
+  <a href="#%e7%bc%96%e8%af%91" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>进入与<code>llvm-project-llvmorg-14.0.6</code>同级的目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mkdir build
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> build
+</span></span><span class="line"><span class="cl">cmake -G Ninja -DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&#34;clang;lld&#34;</span> -DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&#34;X86;ARM;AArch64&#34;</span> -DCMAKE_BUILD_TYPE<span class="o">=</span>Debug -DLLVM_ENABLE_RTTI<span class="o">=</span>ON -DLLVM_INCLUDE_TESTS<span class="o">=</span>OFF -DENABLE_LLVM_SHARED<span class="o">=</span>ON ../llvm-project-llvmorg-14.0.6/llvm</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>-G Ninja</code>：指定使用 Ninja 构建工具生成构建文件。</p>
+<p><code>-DLLVM_TARGETS_TO_BUILD</code>：指定要一起构建的子项目，默认情况下，LLVM 只构建核心库，不包含<code>clang</code></p>
+<p><code>-DLLVM_TARGETS_TO_BUILD</code>：指定要支持的目标架构（后端），限定需要的几个架构可以少编译不少东西，不限定默认编译全部，那样会多占几十GB的硬盘</p>
+<p><code>../llvm-project-llvmorg-14.0.6/llvm</code>：指定源代码目录</p>
+<p><code>-DCMAKE_BUILD_TYPE</code>：设置编译类型，如果只是编译OLLVM可以设置为<code>Release</code>。如果要自己写pass调试，一定一定要设置为<code>Debug</code>版，不然不能调试。（第一次编译<code>Release</code>弄了两天才知道区别天塌了。编译<code>Debug</code>版巨吃性能、硬盘和内存，我Ubuntu虚拟机分配了16核、25GB物理内存、25GB交换内存，160GB硬盘，最后高峰只能用单线程，编译了3个小时产生了近100GB的文件。期间有一次重新编译Ubuntu虚拟机占了350GB把硬盘占满了虚拟机寄了只能重装虚拟机😭😭😭）</p>
+<p>最后</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ninja -j8</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后链接阶段会爆内存，内存够大就多给些内存，内存给不够大了就只开单线程<code>-j1</code>罢，不过也会占用几十个GB</p>
+<p>编译成功</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192753312.png" alt="image-20241220192753312" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192753312.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192753312.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192753312.png?size=large 2x" data-title="image-20241220192753312" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<h2 id="测试clang" class="heading-element"><span>测试Clang</span>
+  <a href="#%e6%b5%8b%e8%af%95clang" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>给clang添加环境变量</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192941275.png" alt="image-20241220192941275" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192941275.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192941275.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220192941275.png?size=large 2x" data-title="image-20241220192941275" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>到自己的路径下写一个<code>helloworld</code>测试一下编译出来的<code>clang</code></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220203853219.png" alt="image-20241220203853219" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220203853219.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220203853219.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241220203853219.png?size=large 2x" data-title="image-20241220203853219" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-21 21:21:27">更新于 212121-1221-1221&nbsp;</span>
+      </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/e1fb916/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/e1fb916/" data-title="LLVM学习——环境搭建" data-hashtags="draft"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/e1fb916/" data-hashtag="draft"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/e1fb916/" data-title="LLVM学习——环境搭建"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/draft/" class="post-tag" title="标签 - Draft">Draft</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/c4731d7/" class="post-nav-item" rel="prev" title="VMP IAT修复学习"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>VMP IAT修复学习</a><a href="/posts/8cffabc/" class="post-nav-item" rel="next" title="LLVM学习——Hello MyPass">LLVM学习——Hello MyPass<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

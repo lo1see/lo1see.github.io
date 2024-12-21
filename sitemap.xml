@@ -2,37 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/categories/</loc>
-    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <lastmod>2024-12-21T21:30:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/tags/draft/</loc>
-    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <lastmod>2024-12-21T21:30:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/categories/draft/</loc>
-    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <lastmod>2024-12-21T21:30:34+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/b1e9cfd/</loc>
+    <lastmod>2024-12-21T21:30:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <lastmod>2024-12-21T21:30:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <lastmod>2024-12-21T21:30:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2024-12-20T18:13:07+08:00</lastmod>
+    <lastmod>2024-12-21T21:30:34+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/9cd1a0f/</loc>
+    <lastmod>2024-12-21T21:27:36+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/a5ddacb/</loc>
+    <lastmod>2024-12-21T21:25:15+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/8cffabc/</loc>
+    <lastmod>2024-12-21T21:23:42+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://localhost:1313/posts/e1fb916/</loc>
+    <lastmod>2024-12-21T21:21:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
