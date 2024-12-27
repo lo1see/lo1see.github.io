@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>Win Kernel学习——APC机制 - lo1see</title><meta name="author" content="">
+<meta name="description" content="随手简记"><meta name="keywords" content='draft'>
+  <meta itemprop="name" content="Win Kernel学习——APC机制">
+  <meta itemprop="description" content="随手简记">
+  <meta itemprop="datePublished" content="2024-12-27T23:48:37+08:00">
+  <meta itemprop="dateModified" content="2024-12-27T23:48:37+08:00">
+  <meta itemprop="wordCount" content="7250">
+  <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/9b5cf17/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="Win Kernel学习——APC机制">
+  <meta property="og:description" content="随手简记">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-27T23:48:37+08:00">
+    <meta property="article:modified_time" content="2024-12-27T23:48:37+08:00">
+    <meta property="article:tag" content="Draft">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Win Kernel学习——APC机制">
+  <meta name="twitter:description" content="随手简记">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/9b5cf17/" title="Win Kernel学习——APC机制 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/b1e9cfd/" title="LLVM学习——控制流平坦化源码学习" /><link rel="next" type="text/html" href="http://localhost:1313/posts/a66c8ac/" title="Win Kernel学习——DPC机制" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/9b5cf17/index.md" title="Win Kernel学习——APC机制 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Win Kernel学习——APC机制",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/9b5cf17\/"
+    },"genre": "posts","keywords": "draft","wordcount":  7250 ,
+    "url": "http:\/\/localhost:1313\/posts\/9b5cf17\/","datePublished": "2024-12-27T23:48:37+08:00","dateModified": "2024-12-27T23:48:37+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>Win Kernel学习——APC机制</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-27 23:48:37"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="272748-1227-1227">272748-1227-1227</time></span>&nbsp;<span title="7250 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 7300 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 15 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#apc相关结构体">APC相关结构体</a>
+      <ul>
+        <li><a href="#_kthread"><code>_KTHREAD</code></a></li>
+        <li><a href="#_kapc_state"><code>_KAPC_STATE</code></a></li>
+        <li><a href="#_kapc"><code>_KAPC</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#线程挂靠">线程挂靠</a></li>
+    <li><a href="#apc类型">APC类型</a></li>
+    <li><a href="#开发细节">开发细节</a>
+      <ul>
+        <li><a href="#内核-apc-的内存使用">内核 APC 的内存使用</a></li>
+        <li><a href="#中断和阻塞内核-apc">中断和阻塞内核 APC</a></li>
+        <li><a href="#apc-和驱动卸载的细微差别">APC 和驱动卸载的细微差别</a></li>
+      </ul>
+    </li>
+    <li><a href="#内核中的用户-apc">内核中的用户 APC</a></li>
+    <li><a href="#apc执行分析">APC执行分析</a></li>
+    <li><a href="#示例代码">示例代码</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="windows内核学习apc机制" class="heading-element"><span>Windows内核学习——APC机制</span>
+  <a href="#windows%e5%86%85%e6%a0%b8%e5%ad%a6%e4%b9%a0apc%e6%9c%ba%e5%88%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="apc相关结构体" class="heading-element"><span>APC相关结构体</span>
+  <a href="#apc%e7%9b%b8%e5%85%b3%e7%bb%93%e6%9e%84%e4%bd%93" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h3 id="_kthread" class="heading-element"><span><code>_KTHREAD</code></span>
+  <a href="#_kthread" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>详细的结构体看这个网站吧，这里只写了相关的几个成员</p>
+<p><a href="https://www.vergiliusproject.com/kernels/x86/windows-7/sp1/_KTHREAD"target="_blank" rel="external nofollow noopener noreferrer">https://www.vergiliusproject.com/kernels/x86/windows-7/sp1/_KTHREAD</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="mi">3</span><span class="o">:</span> <span class="n">kd</span><span class="o">&gt;</span> <span class="n">dt</span> <span class="n">_KTHREAD</span>
+</span></span><span class="line"><span class="cl"><span class="n">ntdll</span><span class="o">!</span><span class="n">_KTHREAD</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">//此线程是否能执行APC；设为0则关闭，不能执行APC，但是永久设为0会使线程卡死，只能暂时设为0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x03c</span> <span class="nl">ApcInterruptRequest</span> <span class="p">:</span> <span class="n">Pos</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span> <span class="n">Bit</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x040</span> <span class="nl">ApcState</span>         <span class="p">:</span> <span class="n">_KAPC_STATE</span>
+</span></span><span class="line"><span class="cl">    <span class="o">+</span><span class="mh">0x040</span> <span class="nl">ApcStateFill</span>     <span class="p">:</span> <span class="p">[</span><span class="mi">23</span><span class="p">]</span> <span class="n">UChar</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//APC队列锁，插入、删除节点的时候会加锁/释放锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x060</span> <span class="nl">ApcQueueLock</span>     <span class="p">:</span> <span class="n">Uint4B</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//关闭普通内核APC，如果非0则关闭，0则开启
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x084</span> <span class="nl">KernelApcDisable</span> <span class="p">:</span> <span class="n">Int2B</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//关闭紧急内核APC，如果非0则关闭，0则开启
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x086</span> <span class="nl">SpecialApcDisable</span> <span class="p">:</span> <span class="n">Int2B</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//Combined包含上面两个，赋值-1则以上两个全部关闭
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x084</span> <span class="nl">CombinedApcDisable</span> <span class="p">:</span> <span class="n">Uint4B</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//是否有APC队列，置1则为有APC队列，0则无APC队列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x0b8</span> <span class="nl">ApcQueueable</span>     <span class="p">:</span> <span class="n">Pos</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span> <span class="n">Bit</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//线程是否挂靠，索引；为1则挂靠，表示在养父进程上；为0则未挂靠，在亲生进程上
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x134</span> <span class="nl">ApcStateIndex</span>    <span class="p">:</span> <span class="n">UChar</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//重要 指向_KAPC_STATE结构
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x168</span> <span class="nl">ApcStatePointer</span>  <span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">Ptr32</span> <span class="n">_KAPC_STATE</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//1表示挂靠，0表示没有挂靠
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">+</span><span class="mh">0x170</span> <span class="nl">SavedApcState</span>    <span class="p">:</span> <span class="n">_KAPC_STATE</span>
+</span></span><span class="line"><span class="cl">    <span class="o">+</span><span class="mh">0x170</span> <span class="nl">SavedApcStateFill</span> <span class="p">:</span> <span class="p">[</span><span class="mi">23</span><span class="p">]</span> <span class="n">UChar</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//......
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="_kapc_state" class="heading-element"><span><code>_KAPC_STATE</code></span>
+  <a href="#_kapc_state" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p><code>_KTHREAD</code>的<code>+0x040 ApcState         : _KAPC_STATE</code>和<code>+0x168 ApcStatePointer  : [2] Ptr32 _KAPC_STATE</code>指向这个结构体</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="mi">3</span><span class="o">:</span> <span class="n">kd</span><span class="o">&gt;</span> <span class="n">dt</span> <span class="n">_KAPC_STATE</span>
+</span></span><span class="line"><span class="cl"><span class="n">ntdll</span><span class="o">!</span><span class="n">_KAPC_STATE</span>
+</span></span><span class="line"><span class="cl">   <span class="c1">//这个队列有两个链表，0代表内核APC队列，1代表用户APC队列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="o">+</span><span class="mh">0x000</span> <span class="nl">ApcListHead</span>      <span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">_LIST_ENTRY</span>
+</span></span><span class="line"><span class="cl">   <span class="c1">//当前进程对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="o">+</span><span class="mh">0x010</span> <span class="nl">Process</span>          <span class="p">:</span> <span class="n">Ptr32</span> <span class="n">_KPROCESS</span>
+</span></span><span class="line"><span class="cl">   <span class="c1">//是否有内核APC在执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="o">+</span><span class="mh">0x014</span> <span class="nl">KernelApcInProgress</span> <span class="p">:</span> <span class="n">UChar</span>
+</span></span><span class="line"><span class="cl">   <span class="c1">//内核APC队列中是否有元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="o">+</span><span class="mh">0x015</span> <span class="nl">KernelApcPending</span> <span class="p">:</span> <span class="n">UChar</span>
+</span></span><span class="line"><span class="cl">   <span class="c1">//用户APC队列中是否有元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="o">+</span><span class="mh">0x016</span> <span class="nl">UserApcPending</span>   <span class="p">:</span> <span class="n">UChar</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="_kapc" class="heading-element"><span><code>_KAPC</code></span>
+  <a href="#_kapc" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p><code>_KAPC_STATE</code>的<code>+0x000 ApcListHead      : [2] _LIST_ENTRY</code>指向<code>_KAPC</code>结构的<code>+0x00c ApcListEntry     : _LIST_ENTRY</code>节点</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">3: kd&gt; dt _KAPC
+</span></span><span class="line"><span class="cl">ntdll!_KAPC
+</span></span><span class="line"><span class="cl">   +0x000 Type             : UChar
+</span></span><span class="line"><span class="cl">   +0x001 SpareByte0       : UChar
+</span></span><span class="line"><span class="cl">   +0x002 Size             : UChar
+</span></span><span class="line"><span class="cl">   +0x003 SpareByte1       : UChar
+</span></span><span class="line"><span class="cl">   +0x004 SpareLong0       : Uint4B
+</span></span><span class="line"><span class="cl">   //指向线程对象，表示是哪个线程的APC
+</span></span><span class="line"><span class="cl">   +0x008 Thread           : Ptr32 _KTHREAD
+</span></span><span class="line"><span class="cl">   //_KAPC_STATE的ApcListHead指向这个元素
+</span></span><span class="line"><span class="cl">   +0x00c ApcListEntry     : _LIST_ENTRY
+</span></span><span class="line"><span class="cl">   //函数以及函数的参数
+</span></span><span class="line"><span class="cl">   +0x014 KernelRoutine    : Ptr32     void 
+</span></span><span class="line"><span class="cl">   +0x018 RundownRoutine   : Ptr32     void 
+</span></span><span class="line"><span class="cl">   +0x01c NormalRoutine    : Ptr32     void 
+</span></span><span class="line"><span class="cl">   +0x020 NormalContext    : Ptr32 Void
+</span></span><span class="line"><span class="cl">   +0x024 SystemArgument1  : Ptr32 Void
+</span></span><span class="line"><span class="cl">   +0x028 SystemArgument2  : Ptr32 Void
+</span></span><span class="line"><span class="cl">   //APC是否挂靠，索引；为1则挂靠，表示在养父进程上；为0则未挂靠，在亲生进程上
+</span></span><span class="line"><span class="cl">   +0x02c ApcStateIndex    : Char
+</span></span><span class="line"><span class="cl">   //描述是内核态APC还是用户态APC
+</span></span><span class="line"><span class="cl">   +0x02d ApcMode          : Char
+</span></span><span class="line"><span class="cl">   //表示这个APC元素是否插入到了APC队列中，已插入则为1
+</span></span><span class="line"><span class="cl">   +0x02e Inserted         : UChar</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>+0x168 ApcStatePointer  : [2]</code>其中一个指向<code>+0x040 ApcState</code>，另一个指向<code>+0x170 SavedApcState</code></p>
+<p>一个线程要挂靠到其他进程上，之前没有挂靠的APC节点环境需要保存到<code>SavedApcState</code>中，挂靠的APC节点保存到<code>ApcState</code>中</p>
+<p><code>ApcStateIndex</code>挂靠索引，只有<code>0, 1</code>两个值，<code>ApcStatePointer[ApcStateIndex]</code>永远指向<code>ApcState</code>队列，另一个指向<code>SavedApcState</code></p>
+<h2 id="线程挂靠" class="heading-element"><span>线程挂靠</span>
+  <a href="#%e7%ba%bf%e7%a8%8b%e6%8c%82%e9%9d%a0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>线程在Windows内核中运行时有时候需要暂时<code>“挂靠”</code>到别的进程的用户空间，即暂时切换到另一个进程的用户空间。这称为<code>“进程挂靠”</code>，因为用户空间是一个进程最主要的特征。</p>
+<p>任何一个线程都可以通过调用<code>KeStackAttachProcess</code>（该函数会接收<code>KAPC_STATE</code>对象，并查看它的<code>ApcState</code>参数）临时地挂靠到另一个进程上，也可以通过调用<code>KeUnstackDetachProcess</code>函数脱离进程。但是这会有会导致问题一点点的可能性，所以开发者需要把注意力放到上面。</p>
+<p>因此，有一个十分重要的事情去理解，我们需要通过使用一个未被文档化但是导出的<code>KeInitializeApc</code>调用初始化一个<code>APC</code>对象：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeInitializeApc</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__out</span> <span class="n">PRKAPC</span> <span class="n">Apc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PRKTHREAD</span> <span class="n">Thread</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">KAPC_ENVIRONMENT</span> <span class="n">Environment</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PKKERNEL_ROUTINE</span> <span class="n">KernelRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PKRUNDOWN_ROUTINE</span> <span class="n">RundownRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PKNORMAL_ROUTINE</span> <span class="n">NormalRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">KPROCESSOR_MODE</span> <span class="n">ApcMode</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PVOID</span> <span class="n">NormalContext</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>第三个参数<code>KAPC_ENVIRONMENT</code>的枚举：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span> <span class="n">_KAPC_ENVIRONMENT</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OriginalApcEnvironment</span><span class="p">,</span>     <span class="c1">//不管是否挂靠，插入到不挂靠的队列中，即亲生进程的环境中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">AttachedApcEnvironment</span><span class="p">,</span>     <span class="c1">//插入到挂靠环境中，即进程进程父环境
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">CurrentApcEnvironment</span><span class="p">,</span>      <span class="c1">//插入到当前环境
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">InsertApcEnvironment</span>        <span class="c1">//初始化不插入，调用KeInsertQueueApc再插入
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">KAPC_ENVIRONMENT</span><span class="p">;</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个参数指定了<code>APC</code>环境
+<code>OriginalApcEnvironment</code>：告诉系统为当前线程激活它
+<code>AttachedApcEnvironment</code>：在线程挂靠到另一个进程之前为保存的状态（<code>KTHREAD::SavedApcState</code>）激活它
+该参数将会在后面保存到<code>KAPC::ApcStateIndex</code>成员当中。</p>
+<p>为了更好的说明这个概念，让我们看如下的<code>KiInsertQueueApc</code>代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// KiInsertQueueApc() excerpt:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="n">Thread</span> <span class="o">=</span> <span class="n">Apc</span><span class="o">-&gt;</span><span class="n">Thread</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">PKAPC_STATE</span> <span class="n">ApcState</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">Apc</span><span class="o">-&gt;</span><span class="n">ApcStateIndex</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">Thread</span><span class="o">-&gt;</span><span class="n">ApcStateIndex</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ApcState</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">Thread</span><span class="o">-&gt;</span><span class="n">SavedApcState</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Apc</span><span class="o">-&gt;</span><span class="n">ApcStateIndex</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">-&gt;</span><span class="n">ApcStateIndex</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ApcState</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">Thread</span><span class="o">-&gt;</span><span class="n">ApcState</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以本质上<code>KAPC::ApcStateIndex</code>是一个布尔值：</p>
+<ul>
+<li>非0：指示<code>APC</code>插入到当前线程中，话句话说，<code>APC</code>应该执行在当前进程的上下文环境中，也就是线程当前运行的环境。</li>
+<li>0：指示当前<code>APC</code>应该仅仅在源进程的环境中运行，或者在线程在进程挂靠之前的进程环境中。</li>
+</ul>
+<p>在<code>KeStackAttachProcess</code>函数中，有如下逻辑：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// KeStackAttachProcess() excerpt:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">Thread</span><span class="o">-&gt;</span><span class="n">ApcStateIndex</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">KiAttachProcess</span><span class="p">(</span><span class="n">Thread</span><span class="p">,</span> <span class="n">Process</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">LockHandle</span><span class="p">,</span> <span class="n">ApcState</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">KiAttachProcess</span><span class="p">(</span><span class="n">Thread</span><span class="p">,</span> <span class="n">Process</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">LockHandle</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Thread</span><span class="o">-&gt;</span><span class="n">SavedApcState</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ApcState</span><span class="o">-&gt;</span><span class="n">Process</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>所以，当本线程第一次挂靠到另一个进程，打个比方：如果它的<code>KAPC::ApcStateIndex</code>值为0，当前的<code>KTHREAD::ApcState</code>存储在<code>KTHREAD::SavedApcState</code>当中，并且以前的<code>ApcState</code>即现在的<code>SavedApcState</code>不会被使用</p>
+<p>这种逻辑处理是为了让系统始终可以访问线程的原始<code>APC</code>状态。这可以用于将<code>APC</code>插入原始线程，或通过调用<code>KeUnstackDetachProcess</code>将线程脱离原进程。</p>
+<h2 id="apc类型" class="heading-element"><span>APC类型</span>
+  <a href="#apc%e7%b1%bb%e5%9e%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><code>APC</code>有两个基础类型：内核<code>APC</code>和用户<code>APC</code>。<code>KAPC_STATE::ApcListHead</code>里面包含了两个链表用来存放内核<code>APC</code>和用户<code>APC</code>。这两个链表分别有<code>APC</code>排队等待线程处理：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">   //这里有两个链表，0代表内核APC队列，1代表用户APC队列
+</span></span><span class="line"><span class="cl">   +0x000 ApcListHead      : [2] _LIST_ENTRY</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>KPROCESSOR_MODE</code>的模式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span> <span class="n">_MODE</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">KernelMode</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">UserMode</span> <span class="o">=</span> <span class="mh">0x1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">MaximumMode</span> <span class="o">=</span> <span class="mh">0x2</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="n">MODE</span><span class="p">;</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>好像也有  紧急APC 和 普通APC</p>
+<p>紧急APC会插入到APC链表中第一个普通APC前</p>
+<h2 id="开发细节" class="heading-element"><span>开发细节</span>
+  <a href="#%e5%bc%80%e5%8f%91%e7%bb%86%e8%8a%82" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h3 id="内核-apc-的内存使用" class="heading-element"><span>内核 APC 的内存使用</span>
+  <a href="#%e5%86%85%e6%a0%b8-apc-%e7%9a%84%e5%86%85%e5%ad%98%e4%bd%bf%e7%94%a8" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p><code>KAPC</code>结构体只能使用从非分页内存分配的内存（或者从类似<code>NonPagedPool*</code>类型分配）。即使在<code>PASSIVE_LEVEL</code>的<code>IRQL</code>初始化并插入<code>APC</code>，也可以避免蓝屏死机（<code>BSOD</code>）。</p>
+<p>为什么要有这样的内存类型限制呢？其他一些<code>APC</code>也可以插入到运行在更高调度级别<code>IRQL</code>的同一线程中。在插入双链接<code>APC</code>列表期间，系统将尝试访问列表中已经存在的其他<code>KAPC</code>结构。因此，如果其中任何一个使用的是从分页内存分配的内存，你将会从<code>DISPATCH_LEVEL</code>间接访问分页内存，这也是一种会导致蓝屏保护原因。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">    <span class="n">PKAPC</span> <span class="n">kApc</span> <span class="o">=</span> <span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">NonPagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KAPC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">memset</span><span class="p">(</span><span class="n">kApc</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KAPC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">KeInitializeApc</span><span class="p">(</span><span class="n">kApc</span><span class="p">,</span> <span class="kr">thread</span><span class="p">,</span> <span class="n">OriginalApcEnvironment</span><span class="p">,</span> <span class="n">KernelApcRoutineCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">KernelMode</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="中断和阻塞内核-apc" class="heading-element"><span>中断和阻塞内核 APC</span>
+  <a href="#%e4%b8%ad%e6%96%ad%e5%92%8c%e9%98%bb%e5%a1%9e%e5%86%85%e6%a0%b8-apc" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>关于内核模式<code>APC</code>，需要记住的重要一点是，它通过中断实现，这意味着它可以发生在代码中的任意两个<code>CPU</code>指令之间。</p>
+<p>内核开发允许我们阻止<code>APC</code>的执行。只有在代码的某些特殊部分起作用：将<code>IRQL</code>提升到<code>APC_LEVEL</code>或更高级别或将写的代码放在<code>KeEnterCriticalRegion</code>和<code>KeLeaveCriticalRegion</code>的调用之间。（请注意，这些函数不会阻止所谓的特殊内核<code>APC</code>的执行，只有提高<code>IRQL</code>级别才能阻止这些<code>APC</code>的执行）。</p>
+<p>关于我在上面展示的<code>IRQL</code>条件限制，一个有趣的事实是，如果<code>APC</code>到达关键区域，它不会丢失，稍后将在以下任一函数中处理：<code>KeLeaveGuardedRegion</code>、 <code>KeLeaveCriticalRegion</code>、<code>KeLowerIrql</code>或者在临界区的结尾。</p>
+<h3 id="apc-和驱动卸载的细微差别" class="heading-element"><span>APC 和驱动卸载的细微差别</span>
+  <a href="#apc-%e5%92%8c%e9%a9%b1%e5%8a%a8%e5%8d%b8%e8%bd%bd%e7%9a%84%e7%bb%86%e5%be%ae%e5%b7%ae%e5%88%ab" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>在调用内核<code>APC</code>回调例程时，有一个微妙的时刻。例如，必须始终提供内核例程（<code>KernelRoutine</code>）回调。因此当驱动程序的<code>APC</code>回调仍在运行时，自己可能无法从内存中卸载，这将一定会导致蓝屏。</p>
+<p>理想情况下，<code>APC</code>的系统实现应如下所示：</p>
+<ul>
+<li>必须在<code>KAPC</code>中有对<code>DriverObject</code>的引用，在插入<code>APC</code>之前，<code>KeInsertQueueApc</code>函数应该已经完成了<code>ObfReferenceObject(Apc-&gt;DriverObject)</code>（此外，如果<code>KeInsertQueueApc</code>失败，也可以在内部调用<code>ObfDereferenceObject(Apc-&gt;DriverObject)</code>），通过这些步骤，当有正在排队的<code>APC</code>时，驱动程序将不会被卸载。</li>
+<li>那么，在最后调用<code>KernelRoutine</code>/ <code>NormalRoutine</code>/<code>RundownRoutine</code>之前，系统应该已经将<code>DriverObject = Apc-&gt;DriverObject</code>读入本地堆栈，调用适当的<code>Apc</code>回调，然后调用<code>ObfDereferenceObject(DriverObject)</code>，因为回调返回后Apc本身将无效。</li>
+<li>此外，如果<code>RundownRoutine</code>是无条件调用的，而不是现在的调用方式，也会非常有用。</li>
+</ul>
+<h2 id="内核中的用户-apc" class="heading-element"><span>内核中的用户 APC</span>
+  <a href="#%e5%86%85%e6%a0%b8%e4%b8%ad%e7%9a%84%e7%94%a8%e6%88%b7-apc" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>对于用户模式<code>APC</code>，情况在以下方面有所不同：</p>
+<ul>
+<li>它不能在任何两条<code>CPU</code>指令之间执行，或者换句话说，它不是通过<code>CPU</code>中断传递的。</li>
+<li>它必须在3环代码或用户模式上下文中运行。</li>
+<li>它仅在线程处于警报状态时执行特定的可等待<code>Windows</code>函数后运行。</li>
+</ul>
+<p><code>CPU</code>首先进入负责路由系统调用的<code>Windows</code>内核部分<code>KiFastCallEntry</code>，然后调用<code>KiDeliverApc</code>根据参数模式处理APC。系统服务调度程序检查用户模式<code>APC</code>的存在并调整内核堆栈上的<code>KTRAP_FRAME</code>以稍后处理用户模式<code>APC</code>。</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222204816140.png" alt="image-20241222204816140" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222204816140.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222204816140.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222204816140.png?size=large 2x" data-title="image-20241222204816140" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>检查并执行<code>APC</code>是在<code>nt!KiDeliverApc</code>函数中完成。根据第一个参数<code>mode</code>，如果传入<code>0</code>则为<code>kernelmode</code>内核模式，执行内核<code>APC</code>，不会执行3环的用户<code>APC</code>；如果传入<code>1</code>则为<code>usermode</code>，会执行用户<code>APC</code>，但执行用户模式<code>APC</code>时同时也会执行内核模式的<code>APC</code>。</p>
+<p>在<code>KiFastCallEntry</code>中调用<code>KiDeliverApc</code>进行用户APC函数的分发与执行。在处理线程的内核模式<code>APC</code>之后，它检查<code>KTHREAD::PreviousMode == UserMode</code>和<code>KTHREAD.SpecialApcDisable</code>是否未设置。如果是，则检查<code>KTHREAD.ApcState.UserApcPending</code>是否不为零，表示用户模式<code>APC</code>的存在。然后它调用<code>nt!KiInitializeUserApc</code>修改用户模式上下文从系统调用返回以处理用户模式<code>APC</code>。</p>
+<p>为此，在调整<code>KTRAP_FRAME</code>以执行返回到本机子系统中的特殊<code>ntdll!KiUserApcDispatcher</code>函数之前，<code>nt!KiInitializeUserApc</code>会保存系统调用应该返回的原始3环上下文，之后再由<code>nt!KiInitializeUserApc</code>返回。</p>
+<p>只是稍后由它返回，在执行<code>sysexit</code>的<code>CPU</code>指令时，由于修改了<code>KTRAP_FRAME</code>上下文，<code>CPU</code>返回到3环中的<code>ntdll!KiUserApcDispatcher</code>函数。该函数依次处理单个用户模式<code>APC</code>，然后调用<code>ntdll!NtContinue(context, TRUE)</code>将执行返回给内核。我上面描述的循环一直持续到线程队列中没有更多的用户模式<code>APC</code>。</p>
+<p>用户模式<code>APC</code>的一些特殊点：</p>
+<ul>
+<li>
+<p>尽管<code>CPU</code>可以在中断后的任意两条指令之间的任何时刻进入内核模式，但此时不会调用用户模式<code>APC</code>回调。用户模式<code>APC</code>只能在执行特殊的<code>Windows API</code>调用后才能调用，正如我在此处所描述的。</p>
+</li>
+<li>
+<p>假设任何需要<code>sysenter</code>的<code>Windows API</code>都可用于在返回时处理用户模式<code>APC</code>，前提是某些内核代码为线程设置了<code>KTHREAD.ApcState.UserApcPending</code>，并且用户模式<code>APC</code>在调用之前排队。</p>
+</li>
+<li>
+<p>设置<code>KTHREAD.ApcState.UserApcPending</code>是<code>MSDN</code>称为线程的警报状态。这是一个有点令人困惑的术语，大概表示用户APC队列中有元素在等待执行吧。</p>
+</li>
+<li>
+<p>哪些<code>API</code>可以设置<code>KTHREAD.ApcState.UserApcPending</code>标志？显然，以下记录的函数可以做到这一点：<code>SleepEx</code>、<code>SignalObjectAndWait</code>、<code>MsgWaitForMultipleObjectsEx</code>、<code>WaitForMultipleObjectsEx</code>或<code>WaitForSingleObjectEx</code>。但也有这些未记录的函数也可以做到这一点：</p>
+<ul>
+<li>
+<p><code>ntdll!NtTestAlert</code>：没有输入参数。似乎它的唯一功能是准备所有排队的用户模式<code>APC</code>。它在内部调用<code>nt!KiInitializeUserApc</code>本身，我在这里描述：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">NTSTATUS</span> <span class="nf">NtTestAlert</span><span class="p">();</span></span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><code>ntdll!NtContinue</code>：它将执行返回给内核以继续处理（就像我在此处描述的那样），然后将执行传递给提供的用户模式<code>ThreadContext</code>，同时如果设置了<code>RaiseAlert</code>，则可以选择设置<code>KTHREAD.ApcState.UserApcPending</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">NTSTATUS</span> <span class="nf">NtContinue</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">IN</span> <span class="n">PCONTEXT</span> <span class="n">ThreadContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">IN</span> <span class="n">BOOLEAN</span> <span class="n">RaiseAlert</span>
+</span></span><span class="line"><span class="cl">  <span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+</li>
+</ul>
+<h2 id="apc执行分析" class="heading-element"><span>APC执行分析</span>
+  <a href="#apc%e6%89%a7%e8%a1%8c%e5%88%86%e6%9e%90" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>从<code>KiFastCallEntry</code>函数中调用到<code>KiDeliverApc</code>进行分发与执行<code>APC</code></p>
+<p>若是在其他地方执行到了<code>KiDeliverApc</code>函数，大部分都是只执行内核态<code>APC</code>，这里以<code>KiFastCallEntry</code>调用的<code>KiDeliverApc</code>为例</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222205737302.png" alt="image-20241222205737302" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222205737302.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222205737302.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222205737302.png?size=large 2x" data-title="image-20241222205737302" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>将<code>Alerted</code>赋值为<code>0</code>，以免被其他<code>APC</code>打断</p>
+<p>比较<code>UserApcPending</code>的值，检查用户<code>APC</code>队列中是否有元素等待执行</p>
+<p>给段寄存器赋值，恢复环境</p>
+<p>提升<code>irql</code>等级，避免被打断</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222210138981.png" alt="image-20241222210138981" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222210138981.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222210138981.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222210138981.png?size=large 2x" data-title="image-20241222210138981" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>判断第三个参数<code>_KTRAP_FRAME</code>是否为空，不为空则执行<code>KiCheckForSListAddress</code>检查一下中断上下文中返回的<code>eip</code>地址</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222174642903.png" alt="image-20241222174642903" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222174642903.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222174642903.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222174642903.png?size=large 2x" data-title="image-20241222174642903" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><code>KiCheckForSListAddress</code>根据中断上下文中的段选择子判断发生中断前的地址状态</p>
+<ul>
+<li>如果当前段是<code>8</code>即内核态，判断当前EIP是否在<code>_ExpInterlockedPopEntrySListResume ~ _ExpInterlockedPopEntrySListEnd</code>之间，如果是，则将EIP置为<code>_ExpInterlockedPopEntrySListResume</code></li>
+<li>如果当前段是<code>1B</code>即用户态，判断当前EIP是否在<code>_KeUserPopEntrySListResume ~ _KeUserPopEntrySListEnd</code>之间，如果是，则将EIP置为<code>_KeUserPopEntrySListResume</code></li>
+</ul>
+<p>如果中断发生在条件的地址中间，就再跑一遍这个函数</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222211514507.png" alt="image-20241222211514507" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222211514507.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222211514507.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222211514507.png?size=large 2x" data-title="image-20241222211514507" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>执行<code>KiCheckForSListAddress</code>之后，会循环获取当前线程的<code>APC</code>队列，判断内核队列是是否为空，如果不为空则提升<code>irql</code>等级到<code>Dispatch Level</code>，避免有其他线程打断后续的执行。</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214213494.png" alt="image-20241222214213494" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214213494.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214213494.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214213494.png?size=large 2x" data-title="image-20241222214213494" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>判断这个<code>APC</code>节点有没有<code>NormalRoutine</code>函数，没有则继续往下执行。恢复<code>irql</code>等级，清除这个<code>APC</code>节点，执行<code>KernelRoutine</code>函数</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214732920.png" alt="image-20241222214732920" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214732920.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214732920.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222214732920.png?size=large 2x" data-title="image-20241222214732920" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>跳转回到循环头判断当前<code>APC</code>队列是否为空，若不为空则继续循环，提升<code>irql</code>等级，添加原子锁，执行<code>KernelRoutine</code>函数</p>
+<p>若有<code>NormalRoutine</code>函数，则会跳转到这里</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222215613140.png" alt="image-20241222215613140" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222215613140.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222215613140.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222215613140.png?size=large 2x" data-title="image-20241222215613140" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>先检查当前的内核<code>APC</code>是否在执行，检查用户<code>APC</code>是否关闭。没有问题则降低<code>irql</code>等级，前后分别执行<code>KernelRoutine</code>函数和<code>NormalRoutine</code>函数</p>
+<ul>
+<li>执行内核APC函数<code>KernelRoutine</code>时<code>irql = 1 (APC Level)</code>，执行前后要提升、降低<code>irql</code>等级，执行时要给<code>_KTHREAD._KAPC_STATE.KernelApcInProgress</code>置1</li>
+<li>执行用户APC函数<code>NormalRoutine</code>时<code>irql = 0 (Passive Level)</code></li>
+</ul>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222222128527.png" alt="image-20241222222128527" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222222128527.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222222128527.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241222222128527.png?size=large 2x" data-title="image-20241222222128527" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144543635.png" alt="image-20241223144543635" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144543635.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144543635.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144543635.png?size=large 2x" data-title="image-20241223144543635" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>在执行完内核<code>APC</code>队列后，判断第一个<code>mode</code>参数是否为1，执行用户<code>APC</code>队列。先判断是否为空，若为空则降低<code>irql</code>等级然后返回</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144938320.png" alt="image-20241223144938320" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144938320.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144938320.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223144938320.png?size=large 2x" data-title="image-20241223144938320" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>再次执行当前节点的内核<code>APC</code>函数</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145513538.png" alt="image-20241223145513538" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145513538.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145513538.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145513538.png?size=large 2x" data-title="image-20241223145513538" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<ol>
+<li>警惕性是一次性的，如果本来就是警惕性为1的时候，在APC节点函数中又没有R3的函数，就会清除警惕性，等待下一次有警惕性再执行</li>
+<li>如果没有警惕性，强行唤醒线程去执行用户APC，但又没有R3函数，那么会修改<code>UserApcPending</code>，等待下一次立马执行</li>
+</ol>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145915355.png" alt="image-20241223145915355" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145915355.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145915355.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241223145915355.png?size=large 2x" data-title="image-20241223145915355" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>如果有<code>NormalRoutine</code>函数，就会进入<code>KiInitializeUserApc</code>函数</p>
+<p>在<code>KiInitializeUserApc</code>会返回<code>R3</code>层分发执行用户<code>APC</code>。再返回<code>R0</code>层继续遍历<code>APC</code>节点，循环执行。</p>
+<p>内核态中有四条线</p>
+<ol>
+<li>R3 - R0  fastcallentry</li>
+<li>APC</li>
+<li>异常</li>
+<li>KeUserModelCallback</li>
+</ol>
+<h2 id="示例代码" class="heading-element"><span>示例代码</span>
+  <a href="#%e7%a4%ba%e4%be%8b%e4%bb%a3%e7%a0%81" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;ntifs.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span> <span class="n">_KAPC_ENVIRONMENT</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OriginalApcEnvironment</span><span class="p">,</span>     <span class="c1">//不管是否挂靠，插入到不挂靠的队列中，即亲生进程的环境中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">AttachedApcEnvironment</span><span class="p">,</span>     <span class="c1">//插入到挂靠环境中，即进程进程父环境
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">CurrentApcEnvironment</span><span class="p">,</span>      <span class="c1">//插入到当前环境
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">InsertApcEnvironment</span>        <span class="c1">//初始化不插入，调用KeInsertQueueApc再插入
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">KAPC_ENVIRONMENT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span>
+</span></span><span class="line"><span class="cl"><span class="nf">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="o">*</span><span class="n">PKNORMAL_ROUTINE</span><span class="p">)</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">PVOID</span> <span class="n">NormalContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span>
+</span></span><span class="line"><span class="cl"><span class="nf">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="o">*</span><span class="n">PKKERNEL_ROUTINE</span><span class="p">)</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="k">struct</span> <span class="n">_KAPC</span><span class="o">*</span> <span class="n">Apc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PKNORMAL_ROUTINE</span><span class="o">*</span> <span class="n">NormalRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PVOID</span><span class="o">*</span> <span class="n">NormalContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PVOID</span><span class="o">*</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PVOID</span><span class="o">*</span> <span class="n">SystemArgument2</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span>
+</span></span><span class="line"><span class="cl"><span class="nf">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="o">*</span><span class="n">PKRUNDOWN_ROUTINE</span><span class="p">)</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="k">struct</span> <span class="n">_KAPC</span><span class="o">*</span> <span class="n">Apc</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeInitializeApc</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__out</span> <span class="n">PRKAPC</span> <span class="n">Apc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PRKTHREAD</span> <span class="n">Thread</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">KAPC_ENVIRONMENT</span> <span class="n">Environment</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PKKERNEL_ROUTINE</span> <span class="n">KernelRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PKRUNDOWN_ROUTINE</span> <span class="n">RundownRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PKNORMAL_ROUTINE</span> <span class="n">NormalRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">KPROCESSOR_MODE</span> <span class="n">ApcMode</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PVOID</span> <span class="n">NormalContext</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOLEAN</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeInsertQueueApc</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__inout</span> <span class="n">PRKAPC</span> <span class="n">Apc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">KPRIORITY</span> <span class="n">Increment</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">KernelApcRoutineCallBack</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="k">struct</span> <span class="n">_KAPC</span><span class="o">*</span> <span class="n">Apc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PKNORMAL_ROUTINE</span><span class="o">*</span> <span class="n">NormalRoutine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PVOID</span><span class="o">*</span> <span class="n">NormalContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PVOID</span><span class="o">*</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">OUT</span> <span class="n">PVOID</span><span class="o">*</span> <span class="n">SystemArgument2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgBreakPoint</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取 DriverObject 并释放其引用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PDRIVER_OBJECT</span> <span class="n">DriverObject</span> <span class="o">=</span> <span class="p">(</span><span class="n">PDRIVER_OBJECT</span><span class="p">)(</span><span class="o">*</span><span class="n">SystemArgument2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">DriverObject</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] APC executed for DriverObject at: %p</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">ObfDereferenceObject</span><span class="p">(</span><span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] SystemArgument2 is NULL.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">PUNICODE_STRING</span> <span class="n">unPath</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">NTSTATUS</span> <span class="n">st</span> <span class="o">=</span> <span class="nf">SeLocateProcessImageName</span><span class="p">(</span><span class="nf">IoGetCurrentProcess</span><span class="p">(),</span> <span class="o">&amp;</span><span class="n">unPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">NT_SUCCESS</span><span class="p">(</span><span class="n">st</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">DbgPrintEx</span><span class="p">(</span><span class="mi">77</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;[lo1see] APC执行进程 unPath: %wZ</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">unPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">ExFreePoolWithTag</span><span class="p">(</span><span class="n">unPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">ExFreePool</span><span class="p">(</span><span class="n">Apc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">PETHREAD</span> <span class="nf">GetThreadByID</span><span class="p">(</span><span class="n">HANDLE</span> <span class="n">tid</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PETHREAD</span> <span class="n">pthread</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">NTSTATUS</span> <span class="n">st</span> <span class="o">=</span> <span class="nf">PsLookupThreadByThreadId</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pthread</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">NT_SUCCESS</span><span class="p">(</span><span class="n">st</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">pthread</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">DriverUnload</span><span class="p">(</span><span class="n">_In_</span> <span class="n">PDRIVER_OBJECT</span> <span class="n">DriverObject</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">UNREFERENCED_PARAMETER</span><span class="p">(</span><span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!!</span><span class="se">\t</span><span class="s">Hello World Driver Unload</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">NTSTATUS</span> <span class="nf">DriverEntry</span><span class="p">(</span><span class="n">_In_</span> <span class="n">PDRIVER_OBJECT</span> <span class="n">DriverObject</span><span class="p">,</span> <span class="n">_In_</span> <span class="n">PUNICODE_STRING</span> <span class="n">RegistryPath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">UNREFERENCED_PARAMETER</span><span class="p">(</span><span class="n">RegistryPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//UNREFERENCED_PARAMETER(DriverObject);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!!</span><span class="se">\t</span><span class="s">Hello World Driver Loaded</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置驱动程序卸载例程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DriverObject</span><span class="o">-&gt;</span><span class="n">DriverUnload</span> <span class="o">=</span> <span class="n">DriverUnload</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">PUNICODE_STRING</span> <span class="n">unPath</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">NTSTATUS</span> <span class="n">st</span> <span class="o">=</span> <span class="nf">SeLocateProcessImageName</span><span class="p">(</span><span class="nf">IoGetCurrentProcess</span><span class="p">(),</span> <span class="o">&amp;</span><span class="n">unPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">NT_SUCCESS</span><span class="p">(</span><span class="n">st</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">DbgPrintEx</span><span class="p">(</span><span class="mi">77</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;[lo1see] main执行进程 unPath: %wZ</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">unPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">ExFreePoolWithTag</span><span class="p">(</span><span class="n">unPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">PKAPC</span> <span class="n">kApc</span> <span class="o">=</span> <span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">NonPagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KAPC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">memset</span><span class="p">(</span><span class="n">kApc</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KAPC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//PETHREAD thread = GetThreadByID(2564);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PETHREAD</span> <span class="kr">thread</span> <span class="o">=</span> <span class="nf">PsGetCurrentThread</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="kr">thread</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">ExFreePool</span><span class="p">(</span><span class="n">kApc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] Failed to find thread by ID.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">STATUS_NOT_FOUND</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">ObfReferenceObject</span><span class="p">(</span><span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeInitializeApc</span><span class="p">(</span><span class="n">kApc</span><span class="p">,</span> <span class="kr">thread</span><span class="p">,</span> <span class="n">OriginalApcEnvironment</span><span class="p">,</span> <span class="n">KernelApcRoutineCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">KernelMode</span><span class="p">,</span> <span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nf">KeInsertQueueApc</span><span class="p">(</span><span class="n">kApc</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">DriverObject</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 插入失败，释放资源
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">ObfDereferenceObject</span><span class="p">(</span><span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">ExFreePool</span><span class="p">(</span><span class="n">kApc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] Failed to insert APC into queue.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">STATUS_UNSUCCESSFUL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] APC successfully inserted into queue.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">STATUS_SUCCESS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-27 23:48:37">更新于 272748-1227-1227&nbsp;</span>
+      </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/9b5cf17/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/9b5cf17/" data-title="Win Kernel学习——APC机制" data-hashtags="draft"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/9b5cf17/" data-hashtag="draft"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/9b5cf17/" data-title="Win Kernel学习——APC机制"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/draft/" class="post-tag" title="标签 - Draft">Draft</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/b1e9cfd/" class="post-nav-item" rel="prev" title="LLVM学习——控制流平坦化源码学习"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>LLVM学习——控制流平坦化源码学习</a><a href="/posts/a66c8ac/" class="post-nav-item" rel="next" title="Win Kernel学习——DPC机制">Win Kernel学习——DPC机制<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

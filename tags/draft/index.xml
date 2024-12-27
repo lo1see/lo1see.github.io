@@ -9,8 +9,32 @@
     <managingEditor>2296161885@qq.com (lo1see)</managingEditor>
     <webMaster>2296161885@qq.com (lo1see)</webMaster>
     <copyright>© 2024, 怜音 - lo1see</copyright>
-    <lastBuildDate>Sat, 21 Dec 2024 21:30:34 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 27 Dec 2024 23:53:48 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/draft/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Win Kernel学习——ETW机制</title>
+      <link>http://localhost:1313/posts/83055c4/</link>
+      <pubDate>Fri, 27 Dec 2024 23:53:48 +0800</pubDate>
+      <guid>http://localhost:1313/posts/83055c4/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>Win Kernel学习——ETW机制</description>
+    </item>
+    <item>
+      <title>Win Kernel学习——DPC机制</title>
+      <link>http://localhost:1313/posts/a66c8ac/</link>
+      <pubDate>Fri, 27 Dec 2024 23:49:24 +0800</pubDate>
+      <guid>http://localhost:1313/posts/a66c8ac/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>Win Kernel学习——DPC机制</description>
+    </item>
+    <item>
+      <title>Win Kernel学习——APC机制</title>
+      <link>http://localhost:1313/posts/9b5cf17/</link>
+      <pubDate>Fri, 27 Dec 2024 23:48:37 +0800</pubDate>
+      <guid>http://localhost:1313/posts/9b5cf17/</guid>
+      <category domain="http://localhost:1313/categories/draft/">Draft</category>
+      <description>Win Kernel学习——APC机制</description>
+    </item>
     <item>
       <title>LLVM学习——控制流平坦化源码学习</title>
       <link>http://localhost:1313/posts/b1e9cfd/</link>

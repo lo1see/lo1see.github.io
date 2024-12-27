@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>Win Kernel学习——DPC机制 - lo1see</title><meta name="author" content="">
+<meta name="description" content="随手简记"><meta name="keywords" content='draft'>
+  <meta itemprop="name" content="Win Kernel学习——DPC机制">
+  <meta itemprop="description" content="随手简记">
+  <meta itemprop="datePublished" content="2024-12-27T23:49:24+08:00">
+  <meta itemprop="dateModified" content="2024-12-27T23:49:24+08:00">
+  <meta itemprop="wordCount" content="2249">
+  <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/a66c8ac/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="Win Kernel学习——DPC机制">
+  <meta property="og:description" content="随手简记">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-27T23:49:24+08:00">
+    <meta property="article:modified_time" content="2024-12-27T23:49:24+08:00">
+    <meta property="article:tag" content="Draft">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Win Kernel学习——DPC机制">
+  <meta name="twitter:description" content="随手简记">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/a66c8ac/" title="Win Kernel学习——DPC机制 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/9b5cf17/" title="Win Kernel学习——APC机制" /><link rel="next" type="text/html" href="http://localhost:1313/posts/83055c4/" title="Win Kernel学习——ETW机制" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/a66c8ac/index.md" title="Win Kernel学习——DPC机制 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Win Kernel学习——DPC机制",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/a66c8ac\/"
+    },"genre": "posts","keywords": "draft","wordcount":  2249 ,
+    "url": "http:\/\/localhost:1313\/posts\/a66c8ac\/","datePublished": "2024-12-27T23:49:24+08:00","dateModified": "2024-12-27T23:49:24+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>Win Kernel学习——DPC机制</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-27 23:49:24"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="272749-1227-1227">272749-1227-1227</time></span>&nbsp;<span title="2249 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 2300 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 5 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#结构体">结构体：</a></li>
+    <li><a href="#开发注意">开发注意</a></li>
+    <li><a href="#插入dpc队列">插入DPC队列</a></li>
+    <li><a href="#设置定时器延时触发">设置定时器延时触发</a></li>
+    <li><a href="#多核侵染">多核侵染</a></li>
+    <li><a href="#队列执行">队列执行</a></li>
+    <li><a href="#完整示例代码">完整示例代码</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="dpc机制" class="heading-element"><span>DPC机制</span>
+  <a href="#dpc%e6%9c%ba%e5%88%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="前言" class="heading-element"><span>前言</span>
+  <a href="#%e5%89%8d%e8%a8%80" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><strong>x86架构设计在上是基于中断思想的，因而从DOS到Win32，操作系统中大量使用中断的概念来表达异步操作的
+行为。但与DOS下独占的情况不同，Win32下需要由系统对多任务进行调度，因此中断响应代码必须尽可能地简单，并且尽快的将控制权交还给系统。虽然这样一来系统调度的响应速度和实现过程方便了，但还是有很多功能需要在中断响应中完成。为此，Win32核心提供了<code>DPC(Deferred Procedure Call)</code>和<code>APC(Asynchronous Procedure Call)</code>两个<code>IRQL</code>特殊的软件中断级别，用于实现延迟和异步的过程调用。</strong></p>
+<p><code>APC</code>：即时过程调用机制</p>
+<p><code>DPC</code>：延时过程调用机制</p>
+<p><code>DPC</code>的栈是独立的，<code>DPC</code>的栈空间与线程的栈空间相互独立</p>
+<p><code>DPC</code>的栈空间会被替换为堆分页内存中的一段3KB大小的空间</p>
+<p>从<code>IRQL</code>分层来说，<code>DPC</code>和<code>APC</code>是介于较高级别的设备中断最低级别的<code>Passive</code>中断之间，由操作系统用于完成特殊方法调用的中断级别。与处理硬件操作的设备中断和更高级别的时钟、处理器中断不同，这两级中断纯粹是为了实现功能调用异步性而设计实现的，因此操作系统本身也对它们具有很强的依赖型。</p>
+<p><code>DPC</code>在功能上可以理解为<code>中断服务例程 ISR(Interrupt Service Routine)</code>的一部分。为每次触发中断，都会关中断，然后执行中断服务例程。由于关中断了，所以<code>中断服务例程</code>必须短小精悍，不能消耗过多时间，否则会导致系统丢失大量其他中断。但是有的中断，其<code>中断服务例程</code>要做的事情本来就很多，那怎么办？于是，可以在<code>中断服务例程</code>中先执行最紧迫的那部分工作，然后把剩余的相对来说不那么重要的工作移入到<code>DPC</code>函数中去执行。因此，<code>DPC</code>又叫<code>ISR</code>的后半部。（比如每次时钟中断后，其<code>isr</code>会扫描系统中的所有定时器是否到点，若到点就调用各定时器的函数。但是这个扫描过程比较耗时，因此，时钟中断的<code>isr</code>会将扫描工作纳入<code>dpc</code>中进行）</p>
+<p>每当触发一个中断时，<code>中断服务例程</code>可以在当前<code>cpu</code>中插入一个<code>DPC</code>，当执行完<code>isr</code>，退出<code>isr</code>后， <code>cpu</code>就会扫描它的<code>dpc</code>队列，依次执行里面的每个<code>dpc</code>，当执行完<code>dpc</code>后，才又回到当前线程的中断处继续执行。</p>
+<h2 id="结构体" class="heading-element"><span>结构体：</span>
+  <a href="#%e7%bb%93%e6%9e%84%e4%bd%93" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_KDPC</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">union</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ULONG</span> <span class="n">TargetInfoAsUlong</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">UCHAR</span> <span class="n">Type</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">UCHAR</span> <span class="n">Importance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">volatile</span> <span class="n">USHORT</span> <span class="n">Number</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="n">DUMMYSTRUCTNAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="n">DUMMYUNIONNAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">SINGLE_LIST_ENTRY</span> <span class="n">DpcListEntry</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">KAFFINITY</span> <span class="n">ProcessorHistory</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PKDEFERRED_ROUTINE</span> <span class="n">DeferredRoutine</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">DeferredContext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">SystemArgument1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">SystemArgument2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__volatile</span> <span class="n">PVOID</span> <span class="n">DpcData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">KDPC</span><span class="p">,</span> <span class="o">*</span><span class="n">PKDPC</span><span class="p">,</span> <span class="o">*</span><span class="n">PRKDPC</span><span class="p">;</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="开发注意" class="heading-element"><span>开发注意</span>
+  <a href="#%e5%bc%80%e5%8f%91%e6%b3%a8%e6%84%8f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><code>DPC</code>一定要申请<code>NonPagedPool</code>非分页内存。<code>DPC</code>内部是运行在<code>Dispatch Level (= 2)</code>的等级下的，而异常也是运行在<code>Dispatch Level</code>等级下的。如果缺页异常<code>Page Fault Exception</code>发生在<code>DPC</code>的内部时，会发生异常处理无法打断<code>DPC</code>的执行，无法修复缺页异常。所以访问分页内存时有概率蓝屏。</p>
+<h2 id="插入dpc队列" class="heading-element"><span>插入DPC队列</span>
+  <a href="#%e6%8f%92%e5%85%a5dpc%e9%98%9f%e5%88%97" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">DpcRoutineCallBack</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_</span> <span class="k">struct</span> <span class="n">_KDPC</span><span class="o">*</span> <span class="n">Dpc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">DeferredContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!! cpuNumber: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">cpuNumber</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//释放DPC内存 插入DPC队列和设置定时器延时触发
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">ExFreePool</span><span class="p">(</span><span class="n">Dpc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//DriverEntry：
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PKDPC</span> <span class="n">kDpc</span> <span class="o">=</span> <span class="p">(</span><span class="n">PKDPC</span><span class="p">)</span><span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">NonPagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KDPC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//插入DPC队列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">KeInitializeDpc</span><span class="p">(</span><span class="n">kDpc</span><span class="p">,</span> <span class="n">DpcRoutineCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置目标CPU核心
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">KeSetTargetProcessorDpc</span><span class="p">(</span><span class="n">kDpc</span><span class="p">,</span> <span class="p">(</span><span class="n">cpuNumber</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeInsertQueueDpc</span><span class="p">(</span><span class="n">kDpc</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="设置定时器延时触发" class="heading-element"><span>设置定时器延时触发</span>
+  <a href="#%e8%ae%be%e7%bd%ae%e5%ae%9a%e6%97%b6%e5%99%a8%e5%bb%b6%e6%97%b6%e8%a7%a6%e5%8f%91" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">DpcRoutineCallBack</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_</span> <span class="k">struct</span> <span class="n">_KDPC</span><span class="o">*</span> <span class="n">Dpc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">DeferredContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!! cpuNumber: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">cpuNumber</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//释放DPC内存 插入DPC队列和设置定时器延时触发，如果设置定时器循环触发不要释放内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">ExFreePool</span><span class="p">(</span><span class="n">Dpc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//DriverEntry：
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PKDPC</span> <span class="n">kDpc</span> <span class="o">=</span> <span class="p">(</span><span class="n">PKDPC</span><span class="p">)</span><span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">NonPagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KDPC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置定时器延时触发
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">KeInitializeDpc</span><span class="p">(</span><span class="n">kDpc</span><span class="p">,</span> <span class="n">DpcRoutineCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PKTIMER</span> <span class="n">kTimer</span> <span class="o">=</span> <span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">NonPagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KTIMER</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeInitializeTimer</span><span class="p">(</span><span class="n">kTimer</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LARGE_INTEGER</span> <span class="n">inTime</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//三秒后执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">inTime</span><span class="p">.</span><span class="n">QuadPart</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10000</span> <span class="o">*</span> <span class="mi">3000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//下面两个二选一都可
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//KeSetTimer(kTimer, inTime, kDpc);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">//3秒钟后每秒触发一次
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">KeSetTimerEx</span><span class="p">(</span><span class="n">kTimer</span><span class="p">,</span> <span class="n">inTime</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">kDpc</span><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="多核侵染" class="heading-element"><span>多核侵染</span>
+  <a href="#%e5%a4%9a%e6%a0%b8%e4%be%b5%e6%9f%93" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>未公开的相关导出函数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeGenericCallDpc</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PKDEFERRED_ROUTINE</span> <span class="n">Routine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PVOID</span> <span class="n">Context</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>		<span class="c1">//每个CPU核心都调用一次
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeSignalCallDpcDone</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>		<span class="c1">//通知调用DPC完毕
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="n">LOGICAL</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeSignalCallDpcSynchronize</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>		<span class="c1">//通知调用DPC完毕
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">DpcRoutineCallBack</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_</span> <span class="k">struct</span> <span class="n">_KDPC</span><span class="o">*</span> <span class="n">Dpc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">DeferredContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!! cpuNumber: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">cpuNumber</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//多核侵染，通知DPC调用已完成
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">KeSignalCallDpcDone</span><span class="p">(</span><span class="n">SystemArgument1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeSignalCallDpcSynchronize</span><span class="p">(</span><span class="n">SystemArgument2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//DriverEntry：
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//多核侵染
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">KeGenericCallDpc</span><span class="p">(</span><span class="n">DpcRoutineCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="队列执行" class="heading-element"><span>队列执行</span>
+  <a href="#%e9%98%9f%e5%88%97%e6%89%a7%e8%a1%8c" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>更隐蔽的一种方式，利用线程执行代码会留下很多痕迹，但是利用队列执行不会。系统中专门有几个系统线程在等待队列链表执行，代码会插入到这个结构体中进行执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_WORK_QUEUE_ITEM</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LIST_ENTRY</span> <span class="n">List</span><span class="p">;</span>						<span class="c1">//链表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PWORKER_THREAD_ROUTINE</span> <span class="n">WorkerRoutine</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__volatile</span> <span class="n">PVOID</span> <span class="n">Parameter</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">WORK_QUEUE_ITEM</span><span class="p">,</span> <span class="o">*</span><span class="n">PWORK_QUEUE_ITEM</span><span class="p">;</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>枚举参数：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="n">_Enum_is_bitflag_</span> <span class="k">enum</span> <span class="n">_WORK_QUEUE_TYPE</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CriticalWorkQueue</span><span class="p">,</span>			<span class="c1">//立即执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DelayedWorkQueue</span><span class="p">,</span>			<span class="c1">//延迟执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">HyperCriticalWorkQueue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">NormalWorkQueue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">BackgroundWorkQueue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">RealTimeWorkQueue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SuperCriticalWorkQueue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MaximumWorkQueue</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CustomPriorityWorkQueue</span> <span class="o">=</span> <span class="mi">32</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">WORK_QUEUE_TYPE</span><span class="p">;</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>队列执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">WorkItemCallBack</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_</span> <span class="n">PVOID</span> <span class="n">Parameter</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LARGE_INTEGER</span> <span class="n">inTime</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//三秒后执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">inTime</span><span class="p">.</span><span class="n">QuadPart</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10000</span> <span class="o">*</span> <span class="mi">3000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeDelayExecutionThread</span><span class="p">(</span><span class="n">KernelMode</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">inTime</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!! cpuNumber: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">cpuNumber</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//DriverEntry：
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//队列执行代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PWORK_QUEUE_ITEM</span> <span class="n">pitem</span> <span class="o">=</span> <span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">PagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WORK_QUEUE_ITEM</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ExInitializeWorkItem</span><span class="p">(</span><span class="n">pitem</span><span class="p">,</span> <span class="n">WorkItemCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ExQueueWorkItem</span><span class="p">(</span><span class="n">pitem</span><span class="p">,</span> <span class="n">CriticalWorkQueue</span><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="完整示例代码" class="heading-element"><span>完整示例代码</span>
+  <a href="#%e5%ae%8c%e6%95%b4%e7%a4%ba%e4%be%8b%e4%bb%a3%e7%a0%81" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;ntifs.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeGenericCallDpc</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PKDEFERRED_ROUTINE</span> <span class="n">Routine</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in_opt</span> <span class="n">PVOID</span> <span class="n">Context</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeSignalCallDpcDone</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LOGICAL</span>
+</span></span><span class="line"><span class="cl"><span class="nf">KeSignalCallDpcSynchronize</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__in</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">DpcRoutineCallBack</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_</span> <span class="k">struct</span> <span class="n">_KDPC</span><span class="o">*</span> <span class="n">Dpc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">DeferredContext</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_opt_</span> <span class="n">PVOID</span> <span class="n">SystemArgument2</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//DbgBreakPoint();
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!! cpuNumber: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">cpuNumber</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//释放DPC内存 插入DPC队列和设置定时器延时触发
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">ExFreePool</span><span class="p">(</span><span class="n">Dpc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//多核侵染
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//KeSignalCallDpcDone(SystemArgument1);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//KeSignalCallDpcSynchronize(SystemArgument2);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">WorkItemCallBack</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_</span> <span class="n">PVOID</span> <span class="n">Parameter</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LARGE_INTEGER</span> <span class="n">inTime</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//三秒后执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">inTime</span><span class="p">.</span><span class="n">QuadPart</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10000</span> <span class="o">*</span> <span class="mi">3000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeDelayExecutionThread</span><span class="p">(</span><span class="n">KernelMode</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">inTime</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!! cpuNumber: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">cpuNumber</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">VOID</span> <span class="nf">DriverUnload</span><span class="p">(</span><span class="n">_In_</span> <span class="n">PDRIVER_OBJECT</span> <span class="n">DriverObject</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">UNREFERENCED_PARAMETER</span><span class="p">(</span><span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!!</span><span class="se">\t</span><span class="s">Hello World Driver Unload</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">NTSTATUS</span> <span class="nf">DriverEntry</span><span class="p">(</span><span class="n">_In_</span> <span class="n">PDRIVER_OBJECT</span> <span class="n">DriverObject</span><span class="p">,</span> <span class="n">_In_</span> <span class="n">PUNICODE_STRING</span> <span class="n">RegistryPath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">UNREFERENCED_PARAMETER</span><span class="p">(</span><span class="n">RegistryPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">UNREFERENCED_PARAMETER</span><span class="p">(</span><span class="n">DriverObject</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s success!!</span><span class="se">\t</span><span class="s">Hello World Driver Loaded</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置驱动程序卸载例程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DriverObject</span><span class="o">-&gt;</span><span class="n">DriverUnload</span> <span class="o">=</span> <span class="n">DriverUnload</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">cpuNumber</span> <span class="o">=</span> <span class="nf">KeGetCurrentProcessorNumberEx</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">DbgPrint</span><span class="p">(</span><span class="s">&#34;[lo1see] %s  cpuNumber: %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">__FUNCTION__</span><span class="p">,</span> <span class="n">cpuNumber</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">PKDPC</span> <span class="n">kDpc</span> <span class="o">=</span> <span class="p">(</span><span class="n">PKDPC</span><span class="p">)</span><span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">NonPagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">KDPC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//插入DPC队列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">KeInitializeDpc</span><span class="p">(</span><span class="n">kDpc</span><span class="p">,</span> <span class="n">DpcRoutineCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeSetTargetProcessorDpc</span><span class="p">(</span><span class="n">kDpc</span><span class="p">,</span> <span class="p">(</span><span class="n">cpuNumber</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">KeInsertQueueDpc</span><span class="p">(</span><span class="n">kDpc</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置定时器延时触发
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//KeInitializeDpc(kDpc, DpcRoutineCallBack, NULL);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//ULONG cpuNumber = KeGetCurrentProcessorNumberEx(NULL);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//PKTIMER kTimer = ExAllocatePool(NonPagedPool, sizeof(KTIMER));
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//KeInitializeTimer(kTimer);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//LARGE_INTEGER inTime = { 0 };
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">////三秒后执行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//inTime.QuadPart = -10000 * 3000;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">////KeSetTimer(kTimer, inTime, kDpc);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//KeSetTimerEx(kTimer, inTime, 1000, kDpc);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//多核侵染
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//KeGenericCallDpc(DpcRoutineCallBack, NULL);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//队列执行代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PWORK_QUEUE_ITEM</span> <span class="n">pitem</span> <span class="o">=</span> <span class="nf">ExAllocatePool</span><span class="p">(</span><span class="n">PagedPool</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WORK_QUEUE_ITEM</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ExInitializeWorkItem</span><span class="p">(</span><span class="n">pitem</span><span class="p">,</span> <span class="n">WorkItemCallBack</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ExQueueWorkItem</span><span class="p">(</span><span class="n">pitem</span><span class="p">,</span> <span class="n">CriticalWorkQueue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">STATUS_SUCCESS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-27 23:49:24">更新于 272749-1227-1227&nbsp;</span>
+      </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/a66c8ac/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/a66c8ac/" data-title="Win Kernel学习——DPC机制" data-hashtags="draft"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/a66c8ac/" data-hashtag="draft"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/a66c8ac/" data-title="Win Kernel学习——DPC机制"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/draft/" class="post-tag" title="标签 - Draft">Draft</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/9b5cf17/" class="post-nav-item" rel="prev" title="Win Kernel学习——APC机制"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>Win Kernel学习——APC机制</a><a href="/posts/83055c4/" class="post-nav-item" rel="next" title="Win Kernel学习——ETW机制">Win Kernel学习——ETW机制<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>

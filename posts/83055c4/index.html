@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>Win Kernel学习——ETW机制 - lo1see</title><meta name="author" content="">
+<meta name="description" content="随手简记"><meta name="keywords" content='draft'>
+  <meta itemprop="name" content="Win Kernel学习——ETW机制">
+  <meta itemprop="description" content="随手简记">
+  <meta itemprop="datePublished" content="2024-12-27T23:53:48+08:00">
+  <meta itemprop="dateModified" content="2024-12-27T23:53:48+08:00">
+  <meta itemprop="wordCount" content="2419">
+  <meta itemprop="keywords" content="Draft"><meta property="og:url" content="http://localhost:1313/posts/83055c4/">
+  <meta property="og:site_name" content="lo1see">
+  <meta property="og:title" content="Win Kernel学习——ETW机制">
+  <meta property="og:description" content="随手简记">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-12-27T23:53:48+08:00">
+    <meta property="article:modified_time" content="2024-12-27T23:53:48+08:00">
+    <meta property="article:tag" content="Draft">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Win Kernel学习——ETW机制">
+  <meta name="twitter:description" content="随手简记">
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" type="text/html" href="http://localhost:1313/posts/83055c4/" title="Win Kernel学习——ETW机制 - lo1see" /><link rel="prev" type="text/html" href="http://localhost:1313/posts/a66c8ac/" title="Win Kernel学习——DPC机制" /><link rel="alternate" type="text/markdown" href="http://localhost:1313/posts/83055c4/index.md" title="Win Kernel学习——ETW机制 - lo1see"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Win Kernel学习——ETW机制",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http:\/\/localhost:1313\/posts\/83055c4\/"
+    },"genre": "posts","keywords": "draft","wordcount":  2419 ,
+    "url": "http:\/\/localhost:1313\/posts\/83055c4\/","datePublished": "2024-12-27T23:53:48+08:00","dateModified": "2024-12-27T23:53:48+08:00","license": "© 2024, 怜音 - lo1see","publisher": {
+      "@type": "Organization",
+      "name": ""},"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="normal" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="lo1see"><span class="header-title-text">lo1see</span></a><span class="header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/archives/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 归档</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span title="转载" class="icon-repost"><i class="fa-solid fa-share fa-fw" aria-hidden="true"></i></span><span>Win Kernel学习——ETW机制</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><i class="fa-solid fa-user-circle" aria-hidden="true"></i>
+      Anonymous</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/draft/" class="post-category" title="分类 - Draft"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> Draft</a></span></div><div class="post-meta-line"><span title="发布于 2024-12-27 23:53:48"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="272753-1227-1227">272753-1227-1227</time></span>&nbsp;<span title="2419 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 2500 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 5 分钟</span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#概述">概述</a>
+      <ul>
+        <li><a href="#什么是etw">什么是<code>ETW</code>？</a></li>
+        <li><a href="#机制">机制</a>
+          <ul>
+            <li><a href="#provider">Provider</a></li>
+            <li><a href="#controller">Controller</a></li>
+            <li><a href="#consumer">Consumer</a></li>
+            <li><a href="#sessions">Sessions</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#结构体">结构体</a></li>
+    <li><a href="#调用分析和hook思路">调用分析和<code>Hook</code>思路</a></li>
+    <li><a href="#参考etw-hook项目">参考<code>ETW Hook</code>项目</a></li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="etw机制" class="heading-element"><span>ETW机制</span>
+  <a href="#etw%e6%9c%ba%e5%88%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h2 id="概述" class="heading-element"><span>概述</span>
+  <a href="#%e6%a6%82%e8%bf%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h3 id="什么是etw" class="heading-element"><span>什么是<code>ETW</code>？</span>
+  <a href="#%e4%bb%80%e4%b9%88%e6%98%afetw" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p><code>ETW</code>是在<code>Windows 2000</code>中引入的，<code>Microsoft</code>需要这样的机制，因为<code>Windows</code>开始变得越来越复杂，越来越多的东西在操作系统中运行，所以在<code>NT4</code>的日子里，很难知道发生了什么。例如，线程上下文切换需要多长时间；什么消耗了大量的<code>CPU</code>时间；为什么这个线程在等待，它在等待什么？为什么需要这么长的时间？
+因此，<code>Microsoft</code>决定在<code>Windows 2000</code>中创建了一个时间跟踪和日志记录机制。它开销低，性能极高，本质上意味着，即使<code>ETW</code>每秒生成数千个事件，它对整个操作系统的性能的影响应该可以忽略不计。</p>
+<p><code>ETW</code>是<code>Event Tracing for Windows</code>的简称，它是<code>Windows</code>提供的原生的事件跟踪日志系统。由于采用内核<code>（Kernel）</code>层面的缓冲和日志记录机制</p>
+<h3 id="机制" class="heading-element"><span>机制</span>
+  <a href="#%e6%9c%ba%e5%88%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><p>通过<code>ETW</code>获取的信息非常丰富，可以通过<code>ETW</code>获取到的信息有：</p>
+<ol>
+<li>文件类信息，包括文件创建、删除、读写等信息。</li>
+<li>注册表信息，包括注册表的创建、删除、读写等信息。</li>
+<li>进程线程信息，包括进程创建退出、线程创建退出、模块加载等。</li>
+<li>网络信息，<code>TCP、UDP</code>协议的发送，接收<code>ip</code>地址以及数据长度等。</li>
+<li><code>CPU</code>的使用情况、内存使用情况以及发生事件时的堆栈信息等。</li>
+</ol>
+<p>更多的信息获取参见<code>MSDN</code>中<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363784%28v=vs.85%29.aspx"target="_blank" rel="external nofollow noopener noreferrer">EnableFlags</a>选项介绍。</p>
+<p>由于<code>ETW</code>获取的信息非常丰富，且对系统性能影响不是很大，因此用来作为一种系统监控手段非常合适。</p>
+<p><code>Event Trace for Windows (ETW)</code> 是一个高效的内核级别的事件追踪机制，它可以记录系统内核或是应用程序的事件到日志文件。我们可以通过实时获取或是从一个日志文件来解析处理这些事件，之后通过这些事件用来调试程序或是找到程序的性能问题。</p>
+<p><code>ETW</code>主要由三部分组成，分别是：</p>
+<ol>
+<li><code>Controllers（事件控制器）</code>，用来开关<code>event trace </code>会话 和 <code>Providers</code>。</li>
+<li><code>Providers（事件提供器）</code>， 用来提供事件。</li>
+<li><code>Consumers（事件消耗器）</code>，用来处理事件。</li>
+</ol>
+<p>另有一个关键的概念<code>Sessions</code>。</p>
+<p>这四者的关系图如下图所示：</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/19327-20160914082309273-200274130.jpg" alt="13" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/19327-20160914082309273-200274130.jpg?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/19327-20160914082309273-200274130.jpg?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/19327-20160914082309273-200274130.jpg?size=large 2x" data-title="13" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>整个<code>ETW</code>系统由<code>Provider，Customer，Controller</code>三个部分构成：</p>
+<h4 id="provider" class="heading-element"><span>Provider</span>
+  <a href="#provider" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>所谓的<code>Provider</code>，就是事件的提供者，它可以是系统组件，驱动程序或者是我们开发的应用程序。首先，它需要向系统进行注册一个<code>Event Trace</code>，然后当这个<code>Provider</code>被<code>Controller</code>启动<code>(Enable)</code>后，它就可以开始向相应的<code>Event Trace Session</code>发送事件了。</p>
+<h4 id="controller" class="heading-element"><span>Controller</span>
+  <a href="#controller" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>顾名思义，<code>Controller</code>就是一个控制器。它的主要任务有两个：一是<code>Event Trace Session</code>的控制管理。它利用<code>StartTrace</code>在内存中创建一个<code>Event Trace session</code>，这样<code>Provider</code>就知道该往哪里发生事件。而<code>Controller</code>也会负责将<code>Session</code>里记录的事件送到<code>Consumer</code>。<code>Controller</code>的第二个任务就是对<code>Provider</code>进行管理，启动或是停止<code>Provider</code>。为了避免额外的开销，<code>Provider</code>不会一直都在工作，只有当被<code>Enable</code>的时候，才开始工作。</p>
+<h4 id="consumer" class="heading-element"><span>Consumer</span>
+  <a href="#consumer" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p><code>Consumer</code>实时地从<code>Event Trace Session</code>或者是日志文件中订阅事件。<code>Consumer</code>主要的作用是提供<code>Event Trace Callback</code>。我们可以设计一个通用的<code>Callback</code>来处理所有的事件，也可以为特定的我们感兴趣的事件设计<code>callback</code>。对于通用事件的<code>callback</code>，我们可以在<code>OpenTrace</code>的时候通过参数指定，而对于特定时间的<code>callback</code>，则可以通过<code>SetTraceCallback</code>指定。</p>
+<h4 id="sessions" class="heading-element"><span>Sessions</span>
+  <a href="#sessions" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>除了上述三个组件外，还有一个概念也较为重要，这便是<code>Session</code>。<code>Session</code>由<code>Controllers</code>定义，<code>Session</code>记录了一个或多个<code>Providers</code>输出的事件，其主要用来管理和刷新事件的缓存。<code>ETW Session</code>提供了一个接收、存储、处理和分发事件的执行上下文。</p>
+<p>系统同时最多支持64个<code>Session</code>，这些Session中有两个<code>Session</code>比较特殊，由操作系统直接定义，可直接使用，分别是：</p>
+<ol>
+<li><code>Global Logger Session</code>, 它用来记录操作系统早期启动过程中的事件，例如设备驱动相关的事件。</li>
+<li><code>NT Kernel Logger Session</code>，它用来记录操作系统生成的预定义系统事件，例如磁盘IO或页面错误事件。</li>
+</ol>
+<h2 id="结构体" class="heading-element"><span>结构体</span>
+  <a href="#%e7%bb%93%e6%9e%84%e4%bd%93" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>关键部分</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="mi">0</span><span class="o">:</span> <span class="n">kd</span><span class="o">&gt;</span> <span class="n">dt</span> <span class="n">_WMI_LOGGER_CONTEXT</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">!</span><span class="n">_WMI_LOGGER_CONTEXT</span>
+</span></span><span class="line"><span class="cl">   <span class="o">+</span><span class="mh">0x000</span> <span class="nl">LoggerId</span>         <span class="p">:</span> <span class="n">Uint4B</span>
+</span></span><span class="line"><span class="cl">   <span class="o">+</span><span class="mh">0x004</span> <span class="nl">BufferSize</span>       <span class="p">:</span> <span class="n">Uint4B</span>
+</span></span><span class="line"><span class="cl">   <span class="o">+</span><span class="mh">0x008</span> <span class="nl">MaximumEventSize</span> <span class="p">:</span> <span class="n">Uint4B</span>
+</span></span><span class="line"><span class="cl">   <span class="o">+</span><span class="mh">0x00c</span> <span class="nl">CollectionOn</span>     <span class="p">:</span> <span class="n">Int4B</span>
+</span></span><span class="line"><span class="cl">   <span class="o">+</span><span class="mh">0x010</span> <span class="nl">LoggerMode</span>       <span class="p">:</span> <span class="n">Uint4B</span>
+</span></span><span class="line"><span class="cl">   <span class="o">+</span><span class="mh">0x014</span> <span class="nl">AcceptNewEvents</span>  <span class="p">:</span> <span class="n">Int4B</span>
+</span></span><span class="line"><span class="cl">   <span class="c1">// win10上是+0x28，与事件记录相关的函数地址，当产生日志时会调用一次这里的函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="o">+</span><span class="mh">0x018</span> <span class="nl">GetCpuClock</span>      <span class="p">:</span> <span class="n">Ptr64</span>     <span class="n">int64</span> 
+</span></span><span class="line"><span class="cl">   <span class="o">+</span><span class="mh">0x020</span> <span class="nl">StartTime</span>        <span class="p">:</span> <span class="n">_LARGE_INTEGER</span>
+</span></span><span class="line"><span class="cl">   <span class="c1">// .......
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="调用分析和hook思路" class="heading-element"><span>调用分析和<code>Hook</code>思路</span>
+  <a href="#%e8%b0%83%e7%94%a8%e5%88%86%e6%9e%90%e5%92%8chook%e6%80%9d%e8%b7%af" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p>这里是学习的老版本的<code>hook</code>思路，有些地方已经被<code>PG</code>保护了，不能适用在新版本的<code>Windows</code>系统上了</p>
+<p>在<code>KiSystemCall64</code>中的日志记录功能部分</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226192216328.png" alt="image-20241226192216328" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226192216328.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226192216328.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226192216328.png?size=large 2x" data-title="image-20241226192216328" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>在<code>KiSystemServiceCopyEnd</code>中判断标志位，查看是否开启了<code>ETW</code>，这里是针对系统调用的日志记录功能。若开启则跳转到日志记录部分稍后进行系统调用，未开启则直接<code>call r10</code>进行系统调用</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226193434090.png" alt="image-20241226193434090" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226193434090.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226193434090.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226193434090.png?size=large 2x" data-title="image-20241226193434090" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>找到这个变量，这个变量就是存储的<code>_WMI_LOGGER_CONTEXT</code>结构体，对<code>GetCpuClock</code>成员进行修改，修改为自己的回调函数</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226203649202.png" alt="image-20241226203649202" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226203649202.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226203649202.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226203649202.png?size=large 2x" data-title="image-20241226203649202" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226194543896.png" alt="image-20241226194543896" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226194543896.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226194543896.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226194543896.png?size=large 2x" data-title="image-20241226194543896" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>开启日志记录功能之后，可以发现暂时将系统调用的函数地址暂存到了栈空间中，在进行日志记录后再从栈空间中读取到<code>r10</code>寄存器中，再进行调用</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195035750.png" alt="image-20241226195035750" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195035750.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195035750.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195035750.png?size=large 2x" data-title="image-20241226195035750" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>在<code>PerfInfoLogSysCallEntry</code>函数中的<code>EtwpTraceKernelEvent</code>函数参数中有很多的常数，作为参数时会被推入栈中，这些常数可以作为特征码进行搜索</p>
+<p><img loading="lazy" src="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195421847.png" alt="image-20241226195421847" srcset="https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195421847.png?size=small, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195421847.png?size=medium 1.5x, https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/image-20241226195421847.png?size=large 2x" data-title="image-20241226195421847" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>经过<code>PerfInfoLogSysCallEntry -&gt; EtwpTraceKernelEvent -&gt; EtwpLogKernelEvent -&gt; EtwpReserveTraceBuffer -&gt; WmipLoggerContext.GetCpuClock</code>的调用流程来到了<code>GetCpuClock</code>指定的函数。这里的函数已经在前面被修改成自定义的函数内容了，这里实现对堆栈的搜索，找到前面在堆栈中存储的系统调用函数地址，将其修改，就可以实现<code>ETW Hook</code>了</p>
+<h2 id="参考etw-hook项目" class="heading-element"><span>参考<code>ETW Hook</code>项目</span>
+  <a href="#%e5%8f%82%e8%80%83etw-hook%e9%a1%b9%e7%9b%ae" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><p><a href="https://github.com/everdox/InfinityHook"target="_blank" rel="external nofollow noopener noreferrer">https://github.com/everdox/InfinityHook</a></p>
+<p><a href="https://github.com/Oxygen1a1/InfinityHook_latest"target="_blank" rel="external nofollow noopener noreferrer">https://github.com/Oxygen1a1/InfinityHook_latest</a></p>
+<p><a href="https://github.com/mapozyan/etw_hook"target="_blank" rel="external nofollow noopener noreferrer">https://github.com/mapozyan/etw_hook</a></p></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2024-12-27 23:53:48">更新于 272753-1227-1227&nbsp;</span>
+      </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/83055c4/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="http://localhost:1313/posts/83055c4/" data-title="Win Kernel学习——ETW机制" data-hashtags="draft"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/83055c4/" data-hashtag="draft"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/83055c4/" data-title="Win Kernel学习——ETW机制"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/draft/" class="post-tag" title="标签 - Draft">Draft</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/a66c8ac/" class="post-nav-item" rel="prev" title="Win Kernel学习——DPC机制"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>Win Kernel学习——DPC机制</a></div>
+</div>
+</article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.139.4"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">lo1see</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/pink/pace-theme-minimal.css"><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":false},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>
