@@ -27,7 +27,7 @@ FS	上下文环境段，R3代表TEB，R0代表KPCR
 
 ## 段描述符
 
-![1730102954233](E:\CyberSecurity\LearningMaterials\一些笔记\火哥笔记\image\1730102954233.jpg)
+![1730102954233](https://cdn.jsdelivr.net/gh/lo1see/Picturebed@main/img/1730102954233.jpg)
 
 AVL：保留，提供给操作系统的软件使用
 
